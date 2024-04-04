@@ -1,11 +1,7 @@
 import express from "express";
+import { CustomError } from "../interfaces";
 
-interface customError extends Error {
-    statusCode?: number;
-    status?: string;
-};
-
-const globalErrors = (err: customError, req: express.Request, res: express.Response, next: express.NextFunction) => {
+const globalErrors = (err: CustomError, req: express.Request, res: express.Response, next: express.NextFunction) => {
     err.statusCode = err.statusCode || 500;
     err.status = err.status || "Error";
     if (process.env.NODE_ENV === "development") {

@@ -1,7 +1,8 @@
 import categoriesModel from "../models/categoriesModel";
-import { createOne, deleteOne, getAll, getOne, updateOne } from "./refactorHandler";
+import { createOne, deleteOne, getAll, getAllList, getOne, updateOne } from "./refactorHandler";
 
-export const getCategories = getAll(categoriesModel);
+export const getCategories = getAll(categoriesModel, 'categories');
+export const getCategoriesList = getAllList(categoriesModel);
 export const createCategory = createOne(categoriesModel);
 export const getCategory = getOne(categoriesModel);
 export const updateCategory = updateOne(categoriesModel);
