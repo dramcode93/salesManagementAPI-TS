@@ -16,7 +16,7 @@ app.use(cors());
 app.use(compression());
 app.use(ExpressMongoSanitize());
 app.use(helmet());
-app.use(hpp({ whitelist: [] }));
+app.use(hpp({ whitelist: ['name'] }));
 dotenv.config();
 
 const port = process.env.PORT;

@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { DeleteCategory, createCategory, getCategories, getCategory, updateCategory } from "../controllers/categories";
+import { DeleteCategory, createCategory, getCategories, getCategoriesList, getCategory, updateCategory } from "../controllers/categories";
 import { createCategoryValidator, deleteCategoryValidator, getCategoryValidator, updateCategoryValidator } from "../utils/validation/categoriesValidator";
 
 const categoriesRoute: Router = Router();
@@ -7,6 +7,8 @@ const categoriesRoute: Router = Router();
 categoriesRoute.route('/')
     .get(getCategories)
     .post(createCategoryValidator, createCategory)
+
+categoriesRoute.get('/list', getCategoriesList);
 
 categoriesRoute.route("/:id")
     .get(getCategoryValidator, getCategory)
