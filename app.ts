@@ -21,7 +21,7 @@ dotenv.config();
 
 const port = process.env.PORT;
 let server: Server;
-DBConnection().then(() => { server = app.listen(port, () => { console.log(`app is listen on port ${port}`); }); })
+DBConnection().then(() => { server = app.listen(port, () => { console.log(`app is listen on port ${port}`); }); });
 mountRoutes(app);
 
 process.on("unhandledRejection", (err: Error) => {
