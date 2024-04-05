@@ -1,8 +1,11 @@
 import { Router } from "express";
 import { DeleteCategory, createCategory, getCategories, getCategoriesList, getCategory, updateCategory } from "../controllers/categories";
 import { createCategoryValidator, deleteCategoryValidator, getCategoryValidator, updateCategoryValidator } from "../utils/validation/categoriesValidator";
+import productsRoute from "./productsRoute";
 
 const categoriesRoute: Router = Router();
+
+categoriesRoute.use('/:categoryId/products', productsRoute)
 
 categoriesRoute.route('/')
     .get(getCategories)
