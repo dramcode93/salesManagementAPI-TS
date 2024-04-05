@@ -13,7 +13,7 @@ export const createCategoryValidator = [
 export const getCategoryValidator = [
     check('id').isMongoId().withMessage("invalid category id"),
     validatorMiddleware
-]
+];
 
 export const updateCategoryValidator = [
     check('id').isMongoId().withMessage("invalid category id"),
@@ -21,11 +21,11 @@ export const updateCategoryValidator = [
         .notEmpty().withMessage("category name is required")
         .isLength({ min: 2, max: 50 }).withMessage("name length must be between 2 and 50"),
     validatorMiddleware
-]
+];
 
 export const deleteCategoryValidator = [
     check('id').isMongoId().withMessage("invalid category id")
-        .custom(async (value: string) => {
+        .custom(async (value: string): Promise<boolean> => {
             const products: ProductModel[] = await productsModel.find({ category: value })
             if (products && products.length > 0) {
                 const deleteProducts = products.map(async (product: ProductModel) => { await productsModel.findByIdAndDelete(product._id) });
@@ -34,4 +34,4 @@ export const deleteCategoryValidator = [
             return true;
         }),
     validatorMiddleware
-]
+];

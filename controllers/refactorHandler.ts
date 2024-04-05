@@ -35,6 +35,7 @@ export const getAllList = <modelType>(model: mongoose.Model<any>) => expressAsyn
 });
 
 export const createOne = <modelType>(model: mongoose.Model<any>) => expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
+    req.body.adminUser = req.user?._id;
     const document: modelType = await model.create(req.body);
     res.status(200).json({ data: document });
 });
@@ -46,6 +47,7 @@ export const getOne = <modelType>(model: mongoose.Model<any>) => expressAsyncHan
 });
 
 export const updateOne = <modelType>(model: mongoose.Model<any>) => expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+    req.body.adminUser = req.user?._id;
     const document: modelType | null = await model.findByIdAndUpdate(req.params.id, req.body, { new: true });
     if (!document) { return next(new ApiErrors(`No document for this id`, 404)); };
     res.status(200).json({ data: document });

@@ -48,4 +48,4 @@ productSchema.pre<ProductModel>(/^find/, function (next: mongoose.CallbackWithou
     next();
 });
 
-export default mongoose.model("products", productSchema)
+export default mongoose.model<ProductModel>("products", productSchema);

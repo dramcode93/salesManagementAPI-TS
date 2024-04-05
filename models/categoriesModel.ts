@@ -14,4 +14,4 @@ const categorySchema: mongoose.Schema = new mongoose.Schema<CategoryModel>({
     }
 }, { timestamps: true });
 
-export default mongoose.model("categories", categorySchema)
+export default mongoose.model<CategoryModel>("categories", categorySchema);
