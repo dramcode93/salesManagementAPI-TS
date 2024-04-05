@@ -16,10 +16,26 @@ interface ProductModel extends mongoose.Document {
     adminUser: mongoose.Schema.Types.ObjectId;
 };
 
+interface UserModel extends mongoose.Document {
+    username: string;
+    name: string;
+    email: string;
+    password: string;
+    role: 'manager' | 'admin' | 'user';
+    active: boolean;
+    users: mongoose.Schema.Types.ObjectId[];
+    adminUser: mongoose.Schema.Types.ObjectId;
+    passwordChangedAt: Date;
+    passwordResetCode: string;
+    passwordResetCodeExpires: Date;
+    passwordResetCodeVerify: boolean;
+    createdAt: Date;
+};
+
 // ? @desc Filter Data
 interface FilterData {
     category?: string;
-    adminUser?: string;
+    adminUser?: string | mongoose.Schema.Types.ObjectId;
 };
 
 // ? @desc Global Errors Interfaces
@@ -57,7 +73,8 @@ interface PaginationQuery {
 declare module 'express' {
     interface Request {
         filterData?: FilterData;
+        user?: UserModel;
     }
 };
 
-export { CategoryModel, ProductModel, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery }
+export { CategoryModel, ProductModel, UserModel, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery }

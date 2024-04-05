@@ -16,6 +16,7 @@ const addProductCategory = (req: express.Request, res: express.Response, next: e
 
 const filterProducts = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     let filterData: FilterData = {};
+    if (req.user?.role === 'admin') { filterData.adminUser = req.user._id } else { filterData.adminUser = req.user?.adminUser };
     if (req.params.categoryId) { filterData.category = req.params.categoryId };
     req.filterData = filterData;
     next();

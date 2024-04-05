@@ -21,7 +21,7 @@ export const createProductValidator = [
     check('category')
         .notEmpty().withMessage('category is required')
         .isMongoId().withMessage('Invalid category id')
-        .custom(async (categoryId: string) => {
+        .custom(async (categoryId: string): Promise<boolean> => {
             const category: CategoryModel | null = await categoriesModel.findById(categoryId);
             if (!category) { return Promise.reject(new Error('Category does not exist')); };
             return true;
@@ -32,7 +32,7 @@ export const createProductValidator = [
 export const getProductValidator = [
     check('id').isMongoId().withMessage("invalid product id"),
     validatorMiddleware
-]
+];
 
 export const updateProductValidator = [
     check('id').isMongoId().withMessage("invalid product id"),
@@ -42,15 +42,15 @@ export const updateProductValidator = [
     check('sellingPrice').optional().isNumeric().withMessage('selling price Must be a number').toFloat(),
     check('sold').optional().isNumeric().withMessage('sold Must be a number').toInt(),
     check('category').optional().isMongoId().withMessage('Invalid category id')
-        .custom(async (categoryId: string) => {
+        .custom(async (categoryId: string): Promise<boolean> => {
             const category: CategoryModel | null = await categoriesModel.findById(categoryId);
             if (!category) { return Promise.reject(new Error('Category does not exist')); };
             return true;
         }),
     validatorMiddleware
-]
+];
 
 export const deleteProductValidator = [
     check('id').isMongoId().withMessage("invalid product id"),
     validatorMiddleware
-]
+];
