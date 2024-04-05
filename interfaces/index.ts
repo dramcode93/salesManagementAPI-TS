@@ -1,3 +1,21 @@
+import mongoose from "mongoose";
+
+//  *@desc models
+interface CategoryModel extends mongoose.Document {
+    name: string;
+    adminUser: mongoose.Schema.Types.ObjectId;
+}
+
+interface ProductModel extends mongoose.Document {
+    name: string;
+    quantity: number;
+    productPrice: number;
+    sellingPrice: number;
+    sold: number;
+    category: mongoose.Schema.Types.ObjectId;
+    adminUser: mongoose.Schema.Types.ObjectId;
+}
+
 // * @desc Global Errors Interfaces
 interface CustomError extends Error {
     statusCode?: number;
@@ -29,4 +47,4 @@ interface PaginationQuery {
     prev?: number;
 };
 
-export { CustomError, QueryString, SearchQuery, PaginationQuery }
+export { CategoryModel, ProductModel, CustomError, QueryString, SearchQuery, PaginationQuery }

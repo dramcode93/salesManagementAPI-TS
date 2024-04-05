@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
-const categorySchema: mongoose.Schema = new mongoose.Schema({
+import { CategoryModel } from "../interfaces";
+const categorySchema: mongoose.Schema = new mongoose.Schema<CategoryModel>({
     name: {
         type: String,
         trim: true,
