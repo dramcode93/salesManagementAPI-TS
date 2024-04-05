@@ -1,9 +1,12 @@
 import categoriesModel from "../models/categoriesModel";
+import { CategoryModel } from "../interfaces";
 import { createOne, deleteOne, getAll, getAllList, getOne, updateOne } from "./refactorHandler";
 
-export const getCategories = getAll(categoriesModel, 'categories');
-export const getCategoriesList = getAllList(categoriesModel);
-export const createCategory = createOne(categoriesModel);
-export const getCategory = getOne(categoriesModel);
-export const updateCategory = updateOne(categoriesModel);
-export const DeleteCategory = deleteOne(categoriesModel);
+const getCategories = getAll<CategoryModel>(categoriesModel, 'categories');
+const getCategoriesList = getAllList<CategoryModel>(categoriesModel);
+const createCategory = createOne<CategoryModel>(categoriesModel);
+const getCategory = getOne<CategoryModel>(categoriesModel);
+const updateCategory = updateOne<CategoryModel>(categoriesModel);
+const DeleteCategory = deleteOne<CategoryModel>(categoriesModel);
+
+export { getCategories, getCategoriesList, createCategory, getCategory, updateCategory, DeleteCategory };
