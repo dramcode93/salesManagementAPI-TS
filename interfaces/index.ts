@@ -1,10 +1,10 @@
 import mongoose from "mongoose";
 
-//  *@desc models
+//  ? @desc models
 interface CategoryModel extends mongoose.Document {
     name: string;
     adminUser: mongoose.Schema.Types.ObjectId;
-}
+};
 
 interface ProductModel extends mongoose.Document {
     name: string;
@@ -14,15 +14,21 @@ interface ProductModel extends mongoose.Document {
     sold: number;
     category: mongoose.Schema.Types.ObjectId;
     adminUser: mongoose.Schema.Types.ObjectId;
-}
+};
 
-// * @desc Global Errors Interfaces
+// ? @desc Filter Data
+interface FilterData {
+    category?: string;
+    adminUser?: string;
+};
+
+// ? @desc Global Errors Interfaces
 interface CustomError extends Error {
     statusCode?: number;
     status?: string;
 };
 
-// * @desc Api Features Interfaces
+// ? @desc Api Features Interfaces
 interface QueryString {
     page?: number;
     limit?: number;
@@ -47,4 +53,11 @@ interface PaginationQuery {
     prev?: number;
 };
 
-export { CategoryModel, ProductModel, CustomError, QueryString, SearchQuery, PaginationQuery }
+//  ? @desc express interfaces
+declare module 'express' {
+    interface Request {
+        filterData?: FilterData;
+    }
+};
+
+export { CategoryModel, ProductModel, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery }
