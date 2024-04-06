@@ -24,7 +24,7 @@ const createUser = expressAsyncHandler(async (req: express.Request, res: express
 const updateUser = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     const user: UserModel | null = await usersModel.findById(req.params.id);
     if (!user) { return next(new ApiErrors('no user for this Id', 404)); };
-    if (req.user?.role === 'admin' && ((req.user._id).toString() !== (user.adminUser).toString())) { return next(new ApiErrors('you can update your users only', 400)); }
+    if (req.user?.role === 'admin' && (req.user._id.toString() !== user.adminUser.toString())) { return next(new ApiErrors('you can update your users only', 400)); }
     else if (user.role === 'manager') { return next(new ApiErrors('You can not update manager data', 400)); };
     await usersModel.findByIdAndUpdate(user._id, { name: req.body.name, email: req.body.email }, { new: true });
     res.status(200).json({ message: 'user updated successfully' });
@@ -33,10 +33,11 @@ const updateUser = expressAsyncHandler(async (req: express.Request, res: express
 const changeUserActivation = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     const user: UserModel | null = await usersModel.findById(req.params.id);
     if (!user) { return next(new ApiErrors('no user for this Id', 404)); };
-    if (user.role === 'manager') { return next(new ApiErrors('You can not update manager activation', 400)); };
+    if (user.role === 'manager' || user._id.toString() === req.user?._id.toString()) { return next(new ApiErrors('You can not update activation', 400)); };
+    if (req.user?.role === 'admin' && (req.user._id.toString() !== user.adminUser.toString())) { return next(new ApiErrors('you can update your users only', 400)); };
     if (req.user?.role === 'manager' && user.role === 'admin') {
         const adminUsers: UserModel[] = await usersModel.find({ adminUser: user._id });
-        if (adminUsers) { const updateUsers = adminUsers.map(async (user) => { await usersModel.findByIdAndUpdate(user._id, { active: req.body.active }, { new: true }); }); await Promise.all(updateUsers); };
+        if (adminUsers) { const updateUsers = adminUsers.map(async (user: UserModel): Promise<void> => { await usersModel.findByIdAndUpdate(user._id, { active: req.body.active }, { new: true }); }); await Promise.all(updateUsers); };
     };
     await usersModel.findByIdAndUpdate(user._id, { active: req.body.active }, { new: true });
     res.status(200).json({ message: 'user updated successfully' });

@@ -1,18 +1,21 @@
 import { Router } from "express";
 import { DeleteCategory, createCategory, filterCategories, getCategories, getCategoriesList, getCategory, updateCategory } from "../controllers/categories";
 import { createCategoryValidator, deleteCategoryValidator, getCategoryValidator, updateCategoryValidator } from "../utils/validation/categoriesValidator";
+import { allowedTo, checkActive, protectRoutes } from "../controllers/auth";
 import productsRoute from "./productsRoute";
 
 const categoriesRoute: Router = Router();
 
 categoriesRoute.use('/:categoryId/products', productsRoute)
+categoriesRoute.use(protectRoutes, checkActive);
 
 categoriesRoute.route('/')
-    .get(filterCategories, getCategories)
-    .post(createCategoryValidator, createCategory)
+    .get(allowedTo('admin', 'user'), filterCategories, getCategories)
+    .post(allowedTo('admin'), createCategoryValidator, createCategory)
 
-categoriesRoute.get('/list', filterCategories, getCategoriesList);
+categoriesRoute.get('/list', allowedTo('admin', 'user'), filterCategories, getCategoriesList);
 
+categoriesRoute.use(allowedTo('admin'))
 categoriesRoute.route("/:id")
     .get(getCategoryValidator, getCategory)
     .put(updateCategoryValidator, updateCategory)
