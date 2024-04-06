@@ -7,5 +7,11 @@ namespace NodeJS {
         JWT_RESET_SECRET_KEY: string;
         EXPIRED_TIME: string;
         EXPIRED_RESET_TIME: string;
+        EMAIL_HOST: string;
+        EMAIL_PORT: number;
+        EMAIL_SECURE: boolean;
+        EMAIL_USERNAME: string;
+        EMAIL_PASSWORD: string;
+        APP_NAME: string;
     };
 };

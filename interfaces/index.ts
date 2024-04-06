@@ -1,6 +1,6 @@
 import mongoose from "mongoose";
 
-//  ? @desc models
+// ? @desc models
 interface CategoryModel extends mongoose.Document {
     name: string;
     adminUser: mongoose.Schema.Types.ObjectId;
@@ -25,10 +25,10 @@ interface UserModel extends mongoose.Document {
     active: boolean;
     users: mongoose.Schema.Types.ObjectId[];
     adminUser: mongoose.Schema.Types.ObjectId;
-    passwordChangedAt: Date;
-    passwordResetCode: string;
-    passwordResetCodeExpires: Date;
-    passwordResetCodeVerify: boolean;
+    passwordChangedAt: Date | number;
+    passwordResetCode: string | undefined;
+    passwordResetCodeExpires: Date | number | undefined;
+    passwordResetCodeVerify: boolean | undefined;
     createdAt: Date;
 };
 
@@ -69,12 +69,28 @@ interface PaginationQuery {
     prev?: number;
 };
 
-//  ? @desc express interfaces
+// ? @desc nodemailer
+interface EmailOptions {
+    email: string;
+    subject: string;
+    message: string;
+};
+
+interface SendEmailOptions {
+    from: string;
+    to: string;
+    subject: string;
+    text: string;
+    html: string;
+};
+
+// ? @desc express interfaces
 declare module 'express' {
     interface Request {
         filterData?: FilterData;
         user?: UserModel;
+        newToken?: string;
     }
 };
 
-export { CategoryModel, ProductModel, UserModel, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery }
+export { CategoryModel, ProductModel, UserModel, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery, EmailOptions, SendEmailOptions }
