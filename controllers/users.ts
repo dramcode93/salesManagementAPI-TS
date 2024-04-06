@@ -33,6 +33,7 @@ const updateUser = expressAsyncHandler(async (req: express.Request, res: express
 const changeUserActivation = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     const user: UserModel | null = await usersModel.findById(req.params.id);
     if (!user) { return next(new ApiErrors('no user for this Id', 404)); };
+    if (user.role === 'manager') { return next(new ApiErrors('You can not update manager activation', 400)); };
     if (req.user?.role === 'manager' && user.role === 'admin') {
         const adminUsers: UserModel[] = await usersModel.find({ adminUser: user._id });
         if (adminUsers) { const updateUsers = adminUsers.map(async (user) => { await usersModel.findByIdAndUpdate(user._id, { active: req.body.active }, { new: true }); }); await Promise.all(updateUsers); };
