@@ -5,7 +5,7 @@ const productSchema: mongoose.Schema = new mongoose.Schema<ProductModel>({
     name: {
         type: String,
         trim: true,
-        require: [true, 'Category name is required'],
+        required: [true, 'Category name is required'],
         minlength: [2, 'min length must be 2'],
         maxlength: [50, 'max length must be 50']
     },
@@ -43,7 +43,7 @@ const productSchema: mongoose.Schema = new mongoose.Schema<ProductModel>({
 
 
 
-productSchema.pre<ProductModel>(/^find/, function (next: mongoose.CallbackWithoutResultAndOptionalError) {
+productSchema.pre<ProductModel>(/^find/, function (next: mongoose.CallbackWithoutResultAndOptionalError): void {
     this.populate({ path: 'category', select: 'name' });
     next();
 });
