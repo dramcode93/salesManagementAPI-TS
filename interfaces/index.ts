@@ -32,10 +32,29 @@ interface UserModel extends mongoose.Document {
     createdAt: Date;
 };
 
+interface BillModel extends mongoose.Document {
+    customerName: string;
+    customerAddress: string;
+    phone: string;
+    products: BillProducts[];
+    totalAmount: number;
+    paidAmount: number;
+    remainingAmount: number;
+    user: mongoose.Schema.Types.ObjectId;
+    adminUser: mongoose.Schema.Types.ObjectId;
+};
+
+interface BillProducts {
+    product: ProductModel;
+    productQuantity: number;
+    totalPrice: number;
+};
+
 // ? @desc Filter Data
 interface FilterData {
     category?: string;
     adminUser?: string | mongoose.Schema.Types.ObjectId;
+    user?: string | mongoose.Schema.Types.ObjectId;
 };
 
 // ? @desc Global Errors Interfaces
@@ -93,4 +112,4 @@ declare module 'express' {
     }
 };
 
-export { CategoryModel, ProductModel, UserModel, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery, EmailOptions, SendEmailOptions }
+export { CategoryModel, ProductModel, BillModel, UserModel, BillProducts, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery, EmailOptions, SendEmailOptions };
