@@ -1,14 +1,18 @@
 import { check } from "express-validator";
 import validatorMiddleware from "../../middlewares/validatorMiddleware";
 import productsModel from "../../models/productsModel";
-import { BillProducts, ProductModel } from "../../interfaces";
+import customersModel from "../../models/customersModel";
+import { BillProducts, CustomerModel, ProductModel } from "../../interfaces";
 
 export const createBillValidator = [
-    check('customerName')
-        .notEmpty().withMessage("Customer Name is required")
-        .isLength({ min: 2, max: 50 }).withMessage("Customer Name length must be between 2 and 50"),
-    check("customerAddress").optional().isLength({ max: 200 }).withMessage("the max length of Customer Address is 200"),
-    check("phone").optional().isMobilePhone("ar-EG").withMessage("InValid Phone Number only accept EG Number "),
+    check('customer')
+        .notEmpty().withMessage("Customer is required")
+        .isMongoId().withMessage("invalid customer id")
+        .custom(async (val: string): Promise<boolean> => {
+            const customer: CustomerModel | null = await customersModel.findById(val);
+            if (!customer) { return Promise.reject(new Error('customer does not exist')); };
+            return true;
+        }),
     check("products")
         .notEmpty().withMessage("Products are required")
         .isArray().withMessage("Products must be an array")
@@ -31,9 +35,12 @@ export const getBillValidator = [
 
 export const updateBillValidator = [
     check("id").isMongoId().withMessage("Invalid Id"),
-    check('customerName').optional().isLength({ min: 2, max: 50 }).withMessage("Name length must be between 2 and 50"),
-    check("customerAddress").optional().isLength({ max: 200 }).withMessage("the max length of Customer Address is 200"),
-    check("phone").optional().isMobilePhone("ar-EG").withMessage("InValid Phone Number only accept EG Number "),
+    check('customer').optional().isMongoId().withMessage("invalid customer id")
+        .custom(async (val: string): Promise<boolean> => {
+            const customer: CustomerModel | null = await customersModel.findById(val);
+            if (!customer) { return Promise.reject(new Error('customer does not exist')); };
+            return true;
+        }),
     check("products").optional().isArray().withMessage("Products must be an array")
         .custom(async (products: BillProducts[]): Promise<boolean> => {
             await Promise.all(products.map(async (productData: BillProducts): Promise<void> => {
