@@ -2,19 +2,11 @@ import mongoose from "mongoose";
 import { BillModel } from "../interfaces";
 
 const billSchema: mongoose.Schema = new mongoose.Schema<BillModel>({
-    customerName: {
-        type: String,
-        trim: true,
+    customer: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'customers',
         required: [true, 'customer name is required'],
-        minlength: [2, 'min length must be 2'],
-        maxlength: [50, 'max length must be 50']
     },
-    customerAddress: {
-        type: String,
-        trim: true,
-        maxlength: [200, 'max length must be 200']
-    },
-    phone: { type: String },
     products: [{
         product: {
             type: mongoose.Schema.Types.ObjectId,
