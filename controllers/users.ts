@@ -26,7 +26,7 @@ const updateUser = expressAsyncHandler(async (req: express.Request, res: express
     if (!user) { return next(new ApiErrors('no user for this Id', 404)); };
     if (req.user?.role === 'admin' && (req.user.shop.toString() !== user.shop.toString())) { return next(new ApiErrors('you can update your users only', 400)); }
     else if (user.role === 'manager') { return next(new ApiErrors('You can not update manager data', 400)); };
-    await usersModel.findByIdAndUpdate(user._id, { name: req.body.name, email: req.body.email }, { new: true });
+    await usersModel.findByIdAndUpdate(user._id, { name: req.body.name, email: req.body.email, phone: req.body.phone }, { new: true });
     res.status(200).json({ message: 'user updated successfully' });
 });
 
@@ -36,8 +36,8 @@ const changeUserActivation = expressAsyncHandler(async (req: express.Request, re
     if (user.role === 'manager' || user._id.toString() === req.user?._id.toString()) { return next(new ApiErrors('You can not update activation', 400)); };
     if (req.user?.role === 'admin' && (req.user.shop.toString() !== user.shop.toString())) { return next(new ApiErrors('you can update your users only', 400)); };
     if (req.user?.role === 'manager' && user.role === 'admin') {
-        const adminUsers: UserModel[] = await usersModel.find({ adminUser: user._id });
-        if (adminUsers) { const updateUsers = adminUsers.map(async (user: UserModel): Promise<void> => { await usersModel.findByIdAndUpdate(user._id, { active: req.body.active }, { new: true }); }); await Promise.all(updateUsers); };
+        const shopUsers: UserModel[] = await usersModel.find({ shop: user.shop });
+        if (shopUsers) { const updateUsers = shopUsers.map(async (user: UserModel): Promise<void> => { await usersModel.findByIdAndUpdate(user._id, { active: req.body.active }, { new: true }); }); await Promise.all(updateUsers); };
     };
     await usersModel.findByIdAndUpdate(user._id, { active: req.body.active }, { new: true });
     res.status(200).json({ message: 'user updated successfully' });
@@ -64,7 +64,8 @@ const getLoggedUserData = expressAsyncHandler((req: express.Request, res: expres
 const updateLoggedUser = expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
     const user: UserModel | null = await usersModel.findByIdAndUpdate(req.user!._id, {
         name: req.body.name,
-        email: req.body.email
+        email: req.body.email,
+        phone: req.body.phone
     }, { new: true });
     const token: string = createToken(user!._id, user!.name, user!.role, user!.createdAt);
     res.status(200).json({ message: 'your data updated successfully', token })
