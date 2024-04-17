@@ -21,7 +21,7 @@ interface UserModel extends mongoose.Document {
     name: string;
     email: string;
     password: string;
-    phone: string;
+    phone: string[];
     role: 'manager' | 'admin' | 'user' | 'customer';
     active: boolean;
     shop: mongoose.Schema.Types.ObjectId;

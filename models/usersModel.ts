@@ -31,7 +31,7 @@ const userSchema: mongoose.Schema = new mongoose.Schema<UserModel>({
         trim: true,
         lowercase: true
     },
-    phone: { type: String },
+    phone: [{ type: String }],
     address: [{
         governorate: { type: mongoose.Schema.Types.ObjectId, ref: "governorates" },
         city: { type: mongoose.Schema.Types.ObjectId, ref: "cities" },
