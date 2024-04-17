@@ -9,15 +9,15 @@ const customerSchema: mongoose.Schema = new mongoose.Schema<CustomerModel>({
         minlength: [2, 'min length must be 2'],
         maxlength: [50, 'max length must be 50']
     },
-    address: {
-        type: String,
-        trim: true,
-        maxlength: [200, 'max length must be 200']
-    },
+    address: [{
+        governorate: { type: mongoose.Schema.Types.ObjectId, ref: "governorates" },
+        city: { type: mongoose.Schema.Types.ObjectId, ref: "cities" },
+        street: { type: String }
+    }],
     phone: { type: String },
-    adminUser: {
+    shop: {
         type: mongoose.Types.ObjectId,
-        ref: "users"
+        ref: "shops"
     }
 }, { timestamps: true });
 

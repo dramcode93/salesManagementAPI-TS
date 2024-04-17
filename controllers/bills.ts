@@ -8,7 +8,7 @@ import { BillModel, BillProducts, FilterData } from "../interfaces";
 
 const filterBills = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
     let filterData: FilterData = {};
-    if (req.user?.role === 'admin') { filterData.adminUser = req.user._id; } else { filterData.adminUser = req.user?.adminUser; };
+    filterData.shop = req.user?.shop;
     if (req.params.id) { filterData.user = req.params.id; };
     next();
 };
@@ -23,7 +23,7 @@ const createBill = expressAsyncHandler(async (req: express.Request, res: express
     const products: BillProducts[] = req.body.products;
     products.map(async (productData: BillProducts): Promise<void> => { await productsModel.findByIdAndUpdate(productData.product, { $inc: { quantity: -productData.productQuantity, sold: productData.productQuantity } }); });
     req.body.user = req.user?._id;
-    if (req.user?.role === 'admin') { req.body.adminUser = req.user?._id; } else { req.body.adminUser = req.user?.adminUser; };
+    req.body.shop = req.user?.shop;
     const bill: BillModel = await billsModel.create(req.body);
     res.status(200).json({ data: bill });
 });
@@ -54,7 +54,7 @@ const updateBill = expressAsyncHandler(async (req: express.Request, res: express
         });
     };
     req.body.user = req.user?._id;
-    if (req.user?.role === 'admin') { req.body.adminUser = req.user._id; } else { req.body.adminUser = req.user?.adminUser; };
+    req.body.shop = req.user?.shop;
     const updatedBill: BillModel | null = await billsModel.findByIdAndUpdate(req.params.id, req.body, { new: true });
     await updatedBill?.save();
     res.status(200).json({ data: updatedBill });

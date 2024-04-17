@@ -16,7 +16,6 @@ const userSchema: mongoose.Schema = new mongoose.Schema<UserModel>({
         type: String,
         trim: true,
         required: [true, 'name is required'],
-        lowercase: true,
         minlength: [2, 'name min length must be 2'],
         maxlength: [50, 'name max length must be 50']
     },
@@ -32,23 +31,24 @@ const userSchema: mongoose.Schema = new mongoose.Schema<UserModel>({
         trim: true,
         lowercase: true
     },
+    phone: { type: String },
+    address: [{
+        governorate: { type: mongoose.Schema.Types.ObjectId, ref: "governorates" },
+        city: { type: mongoose.Schema.Types.ObjectId, ref: "cities" },
+        street: { type: String }
+    }],
     role: {
         type: String,
         trim: true,
-        enum: ['manager', 'admin', 'user'],
-        default: 'user'
+        enum: ['manager', 'admin', 'user', 'customer']
     },
     active: {
         type: Boolean,
         default: true,
     },
-    users: [{
+    shop: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "users",
-    }],
-    adminUser: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "users"
+        ref: "shops"
     },
     passwordChangedAt: { type: Date },
     passwordResetCode: { type: String },
