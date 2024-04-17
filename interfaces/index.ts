@@ -3,7 +3,7 @@ import mongoose from "mongoose";
 // ? @desc models
 interface CategoryModel extends mongoose.Document {
     name: string;
-    adminUser: mongoose.Schema.Types.ObjectId;
+    shop: mongoose.Schema.Types.ObjectId;
 };
 
 interface ProductModel extends mongoose.Document {
@@ -13,7 +13,7 @@ interface ProductModel extends mongoose.Document {
     sellingPrice: number;
     sold: number;
     category: mongoose.Schema.Types.ObjectId;
-    adminUser: mongoose.Schema.Types.ObjectId;
+    shop: mongoose.Schema.Types.ObjectId;
 };
 
 interface UserModel extends mongoose.Document {
@@ -21,10 +21,11 @@ interface UserModel extends mongoose.Document {
     name: string;
     email: string;
     password: string;
-    role: 'manager' | 'admin' | 'user';
+    phone: string;
+    role: 'manager' | 'admin' | 'user' | 'customer';
     active: boolean;
-    users: mongoose.Schema.Types.ObjectId[];
-    adminUser: mongoose.Schema.Types.ObjectId;
+    shop: mongoose.Schema.Types.ObjectId;
+    address: Address[];
     passwordChangedAt: Date | number;
     passwordResetCode: string | undefined;
     passwordResetCodeExpires: Date | number | undefined;
@@ -34,9 +35,15 @@ interface UserModel extends mongoose.Document {
 
 interface CustomerModel extends mongoose.Document {
     name: string;
-    address: string;
+    address: Address[];
     phone: string;
-    adminUser:mongoose.Schema.Types.ObjectId;
+    shop: mongoose.Schema.Types.ObjectId;
+};
+
+interface Address {
+    governorate: GovernorateModel;
+    city: CityModel;
+    street: string;
 };
 
 interface BillModel extends mongoose.Document {
@@ -46,7 +53,7 @@ interface BillModel extends mongoose.Document {
     paidAmount: number;
     remainingAmount: number;
     user: mongoose.Schema.Types.ObjectId;
-    adminUser: mongoose.Schema.Types.ObjectId;
+    shop: mongoose.Schema.Types.ObjectId;
 };
 
 interface BillProducts {
@@ -55,10 +62,31 @@ interface BillProducts {
     totalPrice: number;
 };
 
+interface ShopModel extends mongoose.Document {
+    name: string;
+    type: ShopTypeModel;
+    address: Address[];
+};
+
+interface ShopTypeModel extends mongoose.Document {
+    type: string;
+};
+
+interface GovernorateModel extends mongoose.Document {
+    governorate_name_ar: string;
+    governorate_name_en: string;
+};
+
+interface CityModel extends mongoose.Document {
+    governorate: mongoose.Schema.Types.ObjectId;
+    city_name_ar: string;
+    city_name_en: string;
+};
+
 // ? @desc Filter Data
 interface FilterData {
     category?: string;
-    adminUser?: string | mongoose.Schema.Types.ObjectId;
+    shop?: string | mongoose.Schema.Types.ObjectId;
     user?: string | mongoose.Schema.Types.ObjectId;
 };
 
@@ -117,4 +145,4 @@ declare module 'express' {
     }
 };
 
-export { CategoryModel, ProductModel, CustomerModel, BillModel, UserModel, BillProducts, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery, EmailOptions, SendEmailOptions };
+export { CategoryModel, ProductModel, UserModel, CustomerModel, BillModel, BillProducts, ShopModel, ShopTypeModel, GovernorateModel, CityModel, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery, EmailOptions, SendEmailOptions };

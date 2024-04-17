@@ -24,7 +24,7 @@ const createUser = expressAsyncHandler(async (req: express.Request, res: express
 const updateUser = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     const user: UserModel | null = await usersModel.findById(req.params.id);
     if (!user) { return next(new ApiErrors('no user for this Id', 404)); };
-    if (req.user?.role === 'admin' && (req.user._id.toString() !== user.adminUser.toString())) { return next(new ApiErrors('you can update your users only', 400)); }
+    if (req.user?.role === 'admin' && (req.user.shop.toString() !== user.shop.toString())) { return next(new ApiErrors('you can update your users only', 400)); }
     else if (user.role === 'manager') { return next(new ApiErrors('You can not update manager data', 400)); };
     await usersModel.findByIdAndUpdate(user._id, { name: req.body.name, email: req.body.email }, { new: true });
     res.status(200).json({ message: 'user updated successfully' });
@@ -34,7 +34,7 @@ const changeUserActivation = expressAsyncHandler(async (req: express.Request, re
     const user: UserModel | null = await usersModel.findById(req.params.id);
     if (!user) { return next(new ApiErrors('no user for this Id', 404)); };
     if (user.role === 'manager' || user._id.toString() === req.user?._id.toString()) { return next(new ApiErrors('You can not update activation', 400)); };
-    if (req.user?.role === 'admin' && (req.user._id.toString() !== user.adminUser.toString())) { return next(new ApiErrors('you can update your users only', 400)); };
+    if (req.user?.role === 'admin' && (req.user.shop.toString() !== user.shop.toString())) { return next(new ApiErrors('you can update your users only', 400)); };
     if (req.user?.role === 'manager' && user.role === 'admin') {
         const adminUsers: UserModel[] = await usersModel.find({ adminUser: user._id });
         if (adminUsers) { const updateUsers = adminUsers.map(async (user: UserModel): Promise<void> => { await usersModel.findByIdAndUpdate(user._id, { active: req.body.active }, { new: true }); }); await Promise.all(updateUsers); };
@@ -46,7 +46,7 @@ const changeUserActivation = expressAsyncHandler(async (req: express.Request, re
 const changeUserPassword = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     const user: UserModel | null = await usersModel.findById(req.params.id);
     if (!user) { return next(new ApiErrors(`No user for this id ${req.params.id}`, 404)); }
-    if (req.user?.role === 'admin' && ((req.user._id).toString() !== (user.adminUser).toString())) { return next(new ApiErrors("you can update your users only", 400)); }
+    if (req.user?.role === 'admin' && ((req.user.shop).toString() !== (user.shop).toString())) { return next(new ApiErrors("you can update your users only", 400)); }
     else if (user.role === 'manager') { return next(new ApiErrors('You can not change manager password', 400)); };
     await usersModel.findByIdAndUpdate(user._id, { password: await bcrypt.hash(req.body.password, 13), passwordChangedAt: Date.now() }, { new: true });
     res.status(200).json({ message: 'user password updated successfully' });
@@ -54,7 +54,7 @@ const changeUserPassword = expressAsyncHandler(async (req: express.Request, res:
 
 const filterUsers = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
     let filterData: FilterData = {};
-    if (req.user?.role === 'admin') { filterData.adminUser = req.user._id };
+    if (req.user?.role === 'admin') { filterData.shop = req.user.shop };
     req.filterData = filterData;
     next();
 };

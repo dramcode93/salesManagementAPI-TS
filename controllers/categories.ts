@@ -12,7 +12,7 @@ const DeleteCategory = deleteOne<CategoryModel>(categoriesModel);
 
 const filterCategories = (req: express.Request, res: express.Response, next: express.NextFunction) => {
     let filterData: FilterData = {};
-    if (req.user?.role === 'admin') { filterData.adminUser = req.user._id } else { filterData.adminUser = req.user?.adminUser };
+    filterData.shop = req.user?.shop;
     req.filterData = filterData;
     next();
 };

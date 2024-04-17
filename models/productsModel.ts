@@ -35,9 +35,9 @@ const productSchema: mongoose.Schema = new mongoose.Schema<ProductModel>({
         ref: "categories",
         required: [true, 'category is required']
     },
-    adminUser: {
+    shop: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: "users"
+        ref: "shops"
     }
 }, { timestamps: true });
 
