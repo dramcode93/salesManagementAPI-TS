@@ -2,7 +2,9 @@ import { check } from "express-validator";
 import validatorMiddleware from "../../middlewares/validatorMiddleware";
 import bcrypt from "bcryptjs";
 import usersModel from "../../models/usersModel";
-import { UserModel } from "../../interfaces";
+import governoratesModel from "../../models/governoratesModel";
+import citiesModel from "../../models/citiesModel";
+import { CityModel, GovernorateModel, UserModel, Address } from "../../interfaces";
 
 export const createUserValidator = [
     check('username')
@@ -16,8 +18,19 @@ export const createUserValidator = [
     check('name')
         .notEmpty().withMessage("product name is required")
         .isLength({ min: 2, max: 50 }).withMessage("name length must be between 2 and 50"),
-    check('email')
-        .optional().isEmail().withMessage('Invalid email'),
+    check('email').optional().isEmail().withMessage('Invalid email'),
+    check('phone').optional().isArray().isMobilePhone('ar-EG').withMessage('Invalid phone number'),
+    check('address').optional().isArray().withMessage('Invalid address')
+        .custom(async (address: Address[]): Promise<boolean> => {
+            await Promise.all(address.map(async (item: Address): Promise<void> => {
+                const governorate: GovernorateModel | null = await governoratesModel.findById(item.governorate);
+                if (!governorate) { return Promise.reject(new Error('governorate not found')); };
+                const city: CityModel | null = await citiesModel.findById(item.city);
+                if (!city) { return Promise.reject(new Error('city not found')); };
+                if (city.governorate.toString() !== governorate._id.toString()) { return Promise.reject(new Error('city not belong to this governorate')); };
+            }));
+            return true;
+        }),
     check('password')
         .notEmpty().withMessage('password is required')
         .isLength({ min: 6, max: 14 }).withMessage('password must be between 6 and 14')
