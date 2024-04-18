@@ -1,9 +1,10 @@
 import { Router } from "express";
-import { forgetPassword, login, protectRoutes, refreshToken, resetPassword, verifyResetPasswordCode } from "../controllers/auth";
-import { loginValidator, resetPasswordValidator } from "../utils/validation/authValidator";
+import { forgetPassword, login, protectRoutes, refreshToken, resetPassword, signup, verifyResetPasswordCode } from "../controllers/auth";
+import { loginValidator, resetPasswordValidator, signupValidator } from "../utils/validation/authValidator";
 
 const authRoute: Router = Router();
 
+authRoute.route('/signup').post(signupValidator, signup);
 authRoute.route('/login').post(loginValidator, login);
 authRoute.route('/forgetPassword').post(forgetPassword);
 authRoute.route('/verifyResetPasswordCode').post(verifyResetPasswordCode);

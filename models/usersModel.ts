@@ -58,10 +58,16 @@ const userSchema: mongoose.Schema = new mongoose.Schema<UserModel>({
 
 
 
-userSchema.pre<UserModel>('save', async function (next: mongoose.CallbackWithoutResultAndOptionalError) {
+userSchema.pre<UserModel>('save', async function (next: mongoose.CallbackWithoutResultAndOptionalError): Promise<void> {
     if (!this.isModified('password')) return next();
     const hashedPassword = await bcrypt.hash(this.password, 13);
     this.password = hashedPassword;
+    next();
+});
+
+userSchema.pre<UserModel>(/^find/, function (next: mongoose.CallbackWithoutResultAndOptionalError): void {
+    this.populate({ path: 'address.governorate' });
+    this.populate({ path: 'address.cities' });
     next();
 });
 
