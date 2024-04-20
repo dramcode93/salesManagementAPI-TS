@@ -11,15 +11,15 @@ import { UserModel } from "../interfaces";
 
 const signup = expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
     req.body.role = 'customer';
-    const user = await usersModel.create(req.body);
-    const token = createToken(user._id, user.name, user.role, user.createdAt);
+    const user: UserModel = await usersModel.create(req.body);
+    const token: string = createToken(user._id, user.name, user.role, user.createdAt);
     res.status(201).json({ token });
 });
 
 const login = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     const user: UserModel | null = await usersModel.findOne({ username: req.body.username });
     if (!user || !(await bcrypt.compare(req.body.password, user.password))) { return next(new ApiErrors('Invalid username or password', 401)); };
-    const token = createToken(user._id, user.name, user.role, user.createdAt);
+    const token: string = createToken(user._id, user.name, user.role, user.createdAt);
     res.status(200).json({ token });
 });
 

@@ -88,6 +88,7 @@ interface FilterData {
     category?: string;
     shop?: string | mongoose.Schema.Types.ObjectId;
     user?: string | mongoose.Schema.Types.ObjectId;
+    role?: string;
 };
 
 // ? @desc Global Errors Interfaces
