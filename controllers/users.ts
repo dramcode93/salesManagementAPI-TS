@@ -31,7 +31,7 @@ const addUserPhone = expressAsyncHandler(async (req: express.Request, res: expre
     if (req.user?.role === 'admin' && (req.user.shop.toString() !== user.shop.toString())) { return next(new ApiErrors('you can update your users only', 400)); }
     else if (user.role === 'manager') { return next(new ApiErrors('You can not update manager data', 400)); };
     await usersModel.findByIdAndUpdate(user._id, { $addToSet: { phone: req.body.phone } }, { new: true });
-    res.status(200).json({ message: 'user updated successfully' });
+    res.status(200).json({ message: 'user phone added successfully' });
 });
 
 const addUserAddress = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
@@ -40,7 +40,7 @@ const addUserAddress = expressAsyncHandler(async (req: express.Request, res: exp
     if (req.user?.role === 'admin' && (req.user.shop.toString() !== user.shop.toString())) { return next(new ApiErrors('you can update your users only', 400)); }
     else if (user.role === 'manager') { return next(new ApiErrors('You can not update manager data', 400)); };
     await usersModel.findByIdAndUpdate(user._id, { $addToSet: { address: req.body.address } }, { new: true });
-    res.status(200).json({ message: 'user updated successfully' });
+    res.status(200).json({ message: 'user address added successfully' });
 });
 
 const deleteUserPhone = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
@@ -49,7 +49,7 @@ const deleteUserPhone = expressAsyncHandler(async (req: express.Request, res: ex
     if (req.user?.role === 'admin' && (req.user.shop.toString() !== user.shop.toString())) { return next(new ApiErrors('you can update your users only', 400)); }
     else if (user.role === 'manager') { return next(new ApiErrors('You can not update manager data', 400)); };
     await usersModel.findByIdAndUpdate(user._id, { $pull: { phone: req.body.phone } }, { new: true });
-    res.status(200).json({ message: 'user updated successfully' });
+    res.status(200).json({ message: 'user phone deleted successfully' });
 });
 
 const deleteUserAddress = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
@@ -58,7 +58,7 @@ const deleteUserAddress = expressAsyncHandler(async (req: express.Request, res: 
     if (req.user?.role === 'admin' && (req.user.shop.toString() !== user.shop.toString())) { return next(new ApiErrors('you can update your users only', 400)); }
     else if (user.role === 'manager') { return next(new ApiErrors('You can not update manager data', 400)); };
     await usersModel.findByIdAndUpdate(user._id, { $pull: { address: req.body.address } }, { new: true });
-    res.status(200).json({ message: 'user updated successfully' });
+    res.status(200).json({ message: 'user address deleted successfully' });
 });
 
 const changeUserActivation = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
@@ -111,12 +111,12 @@ const addLoggedUserAddress = expressAsyncHandler(async (req: express.Request, re
 
 const deleteLoggedUserPhone = expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
     await usersModel.findByIdAndUpdate(req.user!._id, { $pull: { phone: req.body.phone } }, { new: true });
-    res.status(200).json({ message: 'your phone number added successfully' });
+    res.status(200).json({ message: 'your phone number deleted successfully' });
 });
 
 const deleteLoggedUserAddress = expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
     await usersModel.findByIdAndUpdate(req.user!._id, { $pull: { address: req.body.address } }, { new: true });
-    res.status(200).json({ message: 'your address added successfully' });
+    res.status(200).json({ message: 'your address deleted successfully' });
 });
 
 const updateLoggedUserPassword = expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {

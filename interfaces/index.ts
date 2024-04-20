@@ -89,6 +89,7 @@ interface FilterData {
     shop?: string | mongoose.Schema.Types.ObjectId;
     user?: string | mongoose.Schema.Types.ObjectId;
     role?: string;
+    governorate?: string | mongoose.Schema.Types.ObjectId;
 };
 
 // ? @desc Global Errors Interfaces
