@@ -25,13 +25,15 @@ export const getAll = <modelType>(model: mongoose.Model<any>, modelName: string)
     res.status(200).json({ results: documents.length, paginationResult, data: documents });
 });
 
-export const getAllList = <modelType>(model: mongoose.Model<any>) => expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
+export const getAllList = <modelType>(model: mongoose.Model<any>, population: string) => expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
     let filterData: FilterData = {};
+    let apiFeatures: ApiFeatures;
     if (req.filterData) { filterData = req.filterData; };
-    const apiFeatures: ApiFeatures = new ApiFeatures(model.find(filterData), req.query).sort();
+    if (population !== '') { apiFeatures = new ApiFeatures(model.find(filterData).populate(population), req.query).sort(); }
+    else { apiFeatures = new ApiFeatures(model.find(filterData), req.query).sort(); };
     const { mongooseQuery } = apiFeatures;
     const documents: modelType[] = await mongooseQuery;
-    res.status(200).json({ results: documents.length, data: documents })
+    res.status(200).json({ results: documents.length, data: documents });
 });
 
 export const createOne = <modelType>(model: mongoose.Model<any>) => expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {

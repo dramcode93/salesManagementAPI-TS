@@ -67,7 +67,7 @@ userSchema.pre<UserModel>('save', async function (next: mongoose.CallbackWithout
 
 userSchema.pre<UserModel>(/^find/, function (next: mongoose.CallbackWithoutResultAndOptionalError): void {
     this.populate({ path: 'address.governorate' });
-    this.populate({ path: 'address.cities' });
+    this.populate({ path: 'address.city' });
     next();
 });
 
