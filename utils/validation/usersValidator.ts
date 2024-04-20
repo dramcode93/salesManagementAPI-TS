@@ -19,7 +19,7 @@ export const createUserValidator = [
         .notEmpty().withMessage("product name is required")
         .isLength({ min: 2, max: 50 }).withMessage("name length must be between 2 and 50"),
     check('email').optional().isEmail().withMessage('Invalid email'),
-    check('phone').optional().isArray().isMobilePhone('ar-EG').withMessage('Invalid phone number'),
+    check('phone').optional().isMobilePhone('ar-EG').withMessage('Invalid phone number'),
     check('address').optional().isArray().withMessage('Invalid address')
         .custom(async (address: Address[]): Promise<boolean> => {
             await Promise.all(address.map(async (item: Address): Promise<void> => {
@@ -56,6 +56,28 @@ export const updateUserValidator = [
     validatorMiddleware
 ];
 
+export const addUserPhoneValidator = [
+    check('id').isMongoId().withMessage("invalid product id"),
+    check('phone').notEmpty().withMessage("phone number can't be empty").isMobilePhone('ar-EG').withMessage('Invalid phone number'),
+    validatorMiddleware
+];
+
+export const addUserAddressValidator = [
+    check('id').isMongoId().withMessage("invalid product id"),
+    check('address').notEmpty().isArray().withMessage('Invalid address')
+        .custom(async (address: Address[]): Promise<boolean> => {
+            await Promise.all(address.map(async (item: Address): Promise<void> => {
+                const governorate: GovernorateModel | null = await governoratesModel.findById(item.governorate);
+                if (!governorate) { return Promise.reject(new Error('governorate not found')); };
+                const city: CityModel | null = await citiesModel.findById(item.city);
+                if (!city) { return Promise.reject(new Error('city not found')); };
+                if (city.governorate.toString() !== governorate._id.toString()) { return Promise.reject(new Error('city not belong to this governorate')); };
+            }));
+            return true;
+        }),
+    validatorMiddleware
+];
+
 export const userActiveValidator = [
     check('id').isMongoId().withMessage("invalid product id"),
     check('active').notEmpty().withMessage('active is required').isBoolean().withMessage('Active field must be a Boolean'),
@@ -85,6 +107,26 @@ export const updateLoggedUserValidator = [
     validatorMiddleware,
 ];
 
+export const addLoggedUserPhoneValidator = [
+    check('phone').notEmpty().withMessage("phone number can't be empty").isMobilePhone('ar-EG').withMessage('Invalid phone number'),
+    validatorMiddleware,
+];
+
+export const addLoggedUserAddressValidator = [
+    check('address').notEmpty().isArray().withMessage('Invalid address')
+        .custom(async (address: Address[]): Promise<boolean> => {
+            await Promise.all(address.map(async (item: Address): Promise<void> => {
+                const governorate: GovernorateModel | null = await governoratesModel.findById(item.governorate);
+                if (!governorate) { return Promise.reject(new Error('governorate not found')); };
+                const city: CityModel | null = await citiesModel.findById(item.city);
+                if (!city) { return Promise.reject(new Error('city not found')); };
+                if (city.governorate.toString() !== governorate._id.toString()) { return Promise.reject(new Error('city not belong to this governorate')); };
+            }));
+            return true;
+        }),
+    validatorMiddleware,
+];
+
 export const updateLoggedUserPasswordValidator = [
     check("currentPassword")
         .notEmpty().withMessage(" You Must Enter Your current Password")
@@ -103,4 +145,9 @@ export const updateLoggedUserPasswordValidator = [
             return true;
         }),
     validatorMiddleware,
+];
+
+export const deleteUserDataValidator = [
+    check('id').isMongoId().withMessage("invalid product id"),
+    validatorMiddleware
 ];
