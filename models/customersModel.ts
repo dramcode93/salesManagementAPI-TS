@@ -5,7 +5,7 @@ const customerSchema: mongoose.Schema = new mongoose.Schema<CustomerModel>({
     name: {
         type: String,
         trim: true,
-        required: [true, 'Category name is required'],
+        required: [true, 'customer name is required'],
         minlength: [2, 'min length must be 2'],
         maxlength: [50, 'max length must be 50']
     },

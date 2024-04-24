@@ -5,7 +5,7 @@ const shopSchema: mongoose.Schema = new mongoose.Schema<ShopModel>({
     name: {
         type: String,
         trim: true,
-        required: [true, 'Category name is required'],
+        required: [true, 'shop name is required'],
         minlength: [2, 'min length must be 2'],
         maxlength: [50, 'max length must be 50']
     },
