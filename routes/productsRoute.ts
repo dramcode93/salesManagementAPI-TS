@@ -7,15 +7,14 @@ const productsRoute: Router = Router({ mergeParams: true });
 productsRoute.use(protectRoutes, checkActive);
 
 productsRoute.route('/')
-    .get(allowedTo('admin', 'user'), filterProducts, getProducts)
+    .get(allowedTo('admin', 'user', 'customer'), filterProducts, getProducts)
     .post(allowedTo('admin'), addProductCategory, createProductValidator, uploadProductImages, resizeImage, createProduct);
 
 productsRoute.get('/list', allowedTo('admin', 'user'), filterProducts, getProductsList);
 
-productsRoute.use(allowedTo('admin'));
 productsRoute.route("/:id")
-    .get(getProductValidator, getProduct)
-    .put(updateProductValidator, updateProduct)
-    .delete(deleteProductValidator, DeleteProduct);
+    .get(allowedTo('admin', 'user', 'customer'), getProductValidator, getProduct)
+    .put(allowedTo('admin'), updateProductValidator, updateProduct)
+    .delete(allowedTo('admin'), deleteProductValidator, DeleteProduct);
 
 export default productsRoute;
