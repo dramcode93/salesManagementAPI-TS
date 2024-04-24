@@ -5,7 +5,7 @@ const billSchema: mongoose.Schema = new mongoose.Schema<BillModel>({
     customer: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'customers',
-        required: [true, 'customer name is required'],
+        required: [true, 'customer id is required'],
     },
     products: [{
         product: {

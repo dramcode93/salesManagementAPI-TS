@@ -5,31 +5,36 @@ const productSchema: mongoose.Schema = new mongoose.Schema<ProductModel>({
     name: {
         type: String,
         trim: true,
-        required: [true, 'Category name is required'],
+        required: [true, 'product name is required'],
         minlength: [2, 'min length must be 2'],
         maxlength: [50, 'max length must be 50']
     },
     quantity: {
         type: Number,
         default: 0,
-        trim: true,
         required: [true, 'product quantity is required']
     },
     productPrice: {
         type: Number,
-        trim: true,
         required: [true, 'product price is required']
     },
     sellingPrice: {
         type: Number,
-        trim: true,
         required: [true, 'selling price is required']
     },
     sold: {
         type: Number,
         default: 0,
-        trim: true,
     },
+    receivedQuantity: {
+        type: Number,
+        default: 0,
+    },
+    badQuantity: {
+        type: Number,
+        default: 0,
+    },
+    images: [{ type: String }],
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "categories",

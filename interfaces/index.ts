@@ -12,6 +12,9 @@ interface ProductModel extends mongoose.Document {
     productPrice: number;
     sellingPrice: number;
     sold: number;
+    receivedQuantity: number;
+    badQuantity: number;
+    images: string[];
     category: mongoose.Schema.Types.ObjectId;
     shop: mongoose.Schema.Types.ObjectId;
 };
@@ -69,7 +72,8 @@ interface ShopModel extends mongoose.Document {
 };
 
 interface ShopTypeModel extends mongoose.Document {
-    type: string;
+    type_ar: string;
+    type_en: string;
 };
 
 interface GovernorateModel extends mongoose.Document {
@@ -144,6 +148,7 @@ declare module 'express' {
         filterData?: FilterData;
         user?: UserModel;
         newToken?: string;
+        files?: any;
     }
 };
 

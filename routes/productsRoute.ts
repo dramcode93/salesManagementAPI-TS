@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { DeleteProduct, addProductCategory, createProduct, filterProducts, getProduct, getProducts, getProductsList, updateProduct } from "../controllers/products";
+import { DeleteProduct, addProductCategory, createProduct, filterProducts, getProduct, getProducts, getProductsList, resizeImage, updateProduct, uploadProductImages } from "../controllers/products";
 import { createProductValidator, deleteProductValidator, getProductValidator, updateProductValidator } from "../utils/validation/productsValidator";
 import { allowedTo, checkActive, protectRoutes } from "../controllers/auth";
 
@@ -8,7 +8,7 @@ productsRoute.use(protectRoutes, checkActive);
 
 productsRoute.route('/')
     .get(allowedTo('admin', 'user'), filterProducts, getProducts)
-    .post(allowedTo('admin'), addProductCategory, createProductValidator, createProduct);
+    .post(allowedTo('admin'), addProductCategory, createProductValidator, uploadProductImages, resizeImage, createProduct);
 
 productsRoute.get('/list', allowedTo('admin', 'user'), filterProducts, getProductsList);
 
