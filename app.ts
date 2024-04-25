@@ -17,6 +17,7 @@ app.use(compression());
 app.use(ExpressMongoSanitize());
 app.use(helmet());
 app.use(hpp({ whitelist: [] })); // ! Protect against HTTP parameters poll
+app.use(express.static('uploads'));
 dotenv.config();
 
 const port = process.env.PORT;

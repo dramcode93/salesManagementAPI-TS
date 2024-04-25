@@ -1,20 +1,38 @@
 import express from "express";
-import categoriesModel from "../models/categoriesModel";
-import { CategoryModel, FilterData } from "../interfaces";
+import expressAsyncHandler from "express-async-handler";
+import shopsModel from "../models/shopsModel";
+import ApiErrors from "../utils/errors";
+import { ShopModel, FilterData } from "../interfaces";
 import { createOne, deleteOne, getAll, getAllList, getOne, updateOne } from "./refactorHandler";
+import usersModel from "../models/usersModel";
 
-const getCategories = getAll<CategoryModel>(categoriesModel, 'categories');
-const getCategoriesList = getAllList<CategoryModel>(categoriesModel, '');
-const createCategory = createOne<CategoryModel>(categoriesModel);
-const getCategory = getOne<CategoryModel>(categoriesModel);
-const updateCategory = updateOne<CategoryModel>(categoriesModel);
-const DeleteCategory = deleteOne<CategoryModel>(categoriesModel);
+const getShops = getAll<ShopModel>(shopsModel, 'shops');
+const getShopsList = getAllList<ShopModel>(shopsModel, '');
+const getShop = getOne<ShopModel>(shopsModel);
+const updateShop = updateOne<ShopModel>(shopsModel);
+const DeleteShop = deleteOne<ShopModel>(shopsModel);
 
-const filterCategories = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
+const createShop = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+    const shop: ShopModel = await shopsModel.create(req.body);
+    await usersModel.findByIdAndUpdate(req.user?._id, { shop: shop._id }, { new: true });
+    res.status(201).json({ data: shop });
+});
+
+const filterShops = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
     let filterData: FilterData = {};
     filterData.shop = req.user?.shop;
     req.filterData = filterData;
     next();
 };
 
-export { getCategories, getCategoriesList, createCategory, getCategory, updateCategory, DeleteCategory, filterCategories };
+const checkShops = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
+    if (req.user?.role !== "customer") { if (!req.user?.shop) { return next(new ApiErrors("you can't do this action without shop", 400)); }; };
+    next();
+};
+
+const checkCreateShop = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
+    if (req.user?.role === "admin" && req.user?.shop) { return next(new ApiErrors("you already have shop you can't create another", 400)); };
+    next();
+};
+
+export { getShops, getShopsList, createShop, getShop, updateShop, DeleteShop, checkShops, checkCreateShop };
