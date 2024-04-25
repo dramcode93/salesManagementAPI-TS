@@ -67,7 +67,7 @@ interface BillProducts {
 
 interface ShopModel extends mongoose.Document {
     name: string;
-    type: ShopTypeModel;
+    type: ShopTypeModel[];
     address: Address[];
 };
 

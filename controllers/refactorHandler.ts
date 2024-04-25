@@ -29,8 +29,8 @@ export const getAllList = <modelType>(model: mongoose.Model<any>, population: st
     let filterData: FilterData = {};
     let apiFeatures: ApiFeatures;
     if (req.filterData) { filterData = req.filterData; };
-    if (population !== '') { apiFeatures = new ApiFeatures(model.find(filterData).populate(population), req.query).sort(); }
-    else { apiFeatures = new ApiFeatures(model.find(filterData), req.query).sort(); };
+    if (population !== '') { apiFeatures = new ApiFeatures(model.find(filterData).populate(population), req.query).sort().limitFields(); }
+    else { apiFeatures = new ApiFeatures(model.find(filterData), req.query).sort().limitFields(); };
     const { mongooseQuery } = apiFeatures;
     const documents: modelType[] = await mongooseQuery;
     res.status(200).json({ results: documents.length, data: documents });
@@ -43,7 +43,11 @@ export const createOne = <modelType>(model: mongoose.Model<any>) => expressAsync
 });
 
 export const getOne = <modelType>(model: mongoose.Model<any>) => expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
-    const document: modelType | null = await model.findById(req.params.id);
+    // const document: modelType | null = await model.findById(req.params.id);
+    // if (!document) { return next(new ApiErrors(`No document for this id`, 404)); };
+    const apiFeatures: ApiFeatures = new ApiFeatures(model.findById(req.params.id), req.query).limitFields();
+    const { mongooseQuery } = apiFeatures;
+    const document: modelType[] = await mongooseQuery;
     if (!document) { return next(new ApiErrors(`No document for this id`, 404)); };
     res.status(200).json({ data: document });
 });
