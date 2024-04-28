@@ -86,7 +86,7 @@ const changeUserPassword = expressAsyncHandler(async (req: express.Request, res:
 const filterUsers = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
     let filterData: FilterData = {};
     if (req.user?.role === 'admin') { filterData.shop = req.user.shop }
-    else if (req.user?.role === 'manager') { filterData.role = req.body.userRole };
+    else if (req.user?.role === 'manager') { filterData.role = req.query.userRole };
     req.filterData = filterData;
     next();
 };

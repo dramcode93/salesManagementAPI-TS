@@ -14,7 +14,7 @@ const customerSchema: mongoose.Schema = new mongoose.Schema<CustomerModel>({
         city: { type: mongoose.Schema.Types.ObjectId, ref: "cities" },
         street: { type: String }
     }],
-    phone: { type: String },
+    phone: [{ type: String }],
     shop: {
         type: mongoose.Types.ObjectId,
         ref: "shops"
