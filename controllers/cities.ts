@@ -8,7 +8,7 @@ const getCity = getOne<CityModel>(citiesModel);
 
 const filterCities = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
     let filterData: FilterData = {};
-    filterData.governorate = req.body.governorate;
+    filterData.governorate = req.query.governorate;
     req.filterData = filterData;
     next();
 };

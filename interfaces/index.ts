@@ -39,7 +39,7 @@ interface UserModel extends mongoose.Document {
 interface CustomerModel extends mongoose.Document {
     name: string;
     address: Address[];
-    phone: string;
+    phone: string[];
     shop: mongoose.Schema.Types.ObjectId;
 };
 
@@ -92,8 +92,8 @@ interface FilterData {
     category?: string;
     shop?: string | mongoose.Schema.Types.ObjectId;
     user?: string | mongoose.Schema.Types.ObjectId;
-    role?: string;
-    governorate?: string | mongoose.Schema.Types.ObjectId;
+    role?: any;
+    governorate?: any;
 };
 
 // ? @desc Global Errors Interfaces
