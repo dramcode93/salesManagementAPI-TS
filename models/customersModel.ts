@@ -21,4 +21,10 @@ const customerSchema: mongoose.Schema = new mongoose.Schema<CustomerModel>({
     }
 }, { timestamps: true });
 
+customerSchema.pre<CustomerModel>(/^find/, function (next: mongoose.CallbackWithoutResultAndOptionalError): void {
+    this.populate({ path: 'address.governorate' });
+    this.populate({ path: 'address.city' });
+    next();
+});
+
 export default mongoose.model<CustomerModel>("customers", customerSchema);
