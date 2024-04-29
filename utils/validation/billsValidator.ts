@@ -8,8 +8,8 @@ export const createBillValidator = [
     check('customer')
         .notEmpty().withMessage("Customer is required")
         .isMongoId().withMessage("invalid customer id")
-        .custom(async (val: string): Promise<boolean> => {
-            const customer: CustomerModel | null = await customersModel.findById(val);
+        .custom(async (val: string, { req }): Promise<boolean> => {
+            const customer: CustomerModel | null = await customersModel.findOne({ _id: val, shop: req.user.shop });
             if (!customer) { return Promise.reject(new Error('customer does not exist')); };
             return true;
         }),
@@ -36,8 +36,8 @@ export const getBillValidator = [
 export const updateBillValidator = [
     check("id").isMongoId().withMessage("Invalid Id"),
     check('customer').optional().isMongoId().withMessage("invalid customer id")
-        .custom(async (val: string): Promise<boolean> => {
-            const customer: CustomerModel | null = await customersModel.findById(val);
+        .custom(async (val: string, { req }): Promise<boolean> => {
+            const customer: CustomerModel | null = await customersModel.findOne({ _id: val, shop: req.user.shop });
             if (!customer) { return Promise.reject(new Error('customer does not exist')); };
             return true;
         }),
