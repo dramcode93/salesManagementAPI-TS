@@ -14,8 +14,8 @@ customersRoute.route('/')
 customersRoute.get('/list', filterCustomers, getCustomersList);
 
 customersRoute.route("/:id")
-    .get(getCustomerValidator, getCustomer);
-// .put(updateCustomer)
-// .delete(deleteCustomer);
+    .get(getCustomerValidator, getCustomer)
+    .put(updateCustomer)
+    .delete(deleteCustomer);
 
 export default customersRoute;

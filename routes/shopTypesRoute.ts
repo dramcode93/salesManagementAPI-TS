@@ -15,7 +15,7 @@ shopTypesRoute.get('/list', getShopTypesList);
 
 shopTypesRoute.route("/:id")
     .get(getShopTypeValidator, getShopType)
-    .put(allowedTo('manager'), updateShopTypeValidator, updateShopType);
-// .delete(allowedTo('manager'), deleteShopTypeValidator, deleteShopType);
+    .put(allowedTo('manager'), updateShopTypeValidator, updateShopType)
+    .delete(allowedTo('manager'), deleteShopTypeValidator, deleteShopType);
 
 export default shopTypesRoute;
