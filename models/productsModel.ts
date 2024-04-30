@@ -9,6 +9,13 @@ const productSchema: mongoose.Schema = new mongoose.Schema<ProductModel>({
         minlength: [2, 'min length must be 2'],
         maxlength: [50, 'max length must be 50']
     },
+    description: {
+        type: String,
+        trim: true,
+        required: [true, 'product description is required'],
+        minlength: [2, 'min length must be 2'],
+        maxlength: [300, 'max length must be 300']
+    },
     quantity: {
         type: Number,
         default: 0,

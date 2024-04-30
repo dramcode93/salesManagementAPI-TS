@@ -7,6 +7,9 @@ export const createProductValidator = [
     check('name')
         .notEmpty().withMessage("product name is required")
         .isLength({ min: 2, max: 50 }).withMessage("name length must be between 2 and 50"),
+    check('description')
+        .notEmpty().withMessage("product description is required")
+        .isLength({ min: 2, max: 300 }).withMessage("name length must be between 2 and 300"),
     check('quantity')
         .notEmpty().withMessage('Quantity is required')
         .isNumeric().withMessage('Quantity Must be a number').toInt(),
@@ -37,6 +40,7 @@ export const getProductValidator = [
 export const updateProductValidator = [
     check('id').isMongoId().withMessage("invalid product id"),
     check('name').optional().isLength({ min: 2, max: 50 }).withMessage("name length must be between 2 and 50"),
+    check('description').optional().isLength({ min: 2, max: 300 }).withMessage("description length must be between 2 and 300"),
     check('quantity').optional().isNumeric().withMessage('Quantity Must be a number').toInt(),
     check('productPrice').optional().isNumeric().withMessage('product price Must be a number').toFloat(),
     check('sellingPrice').optional().isNumeric().withMessage('selling price Must be a number').toFloat(),
