@@ -8,6 +8,7 @@ interface CategoryModel extends mongoose.Document {
 
 interface ProductModel extends mongoose.Document {
     name: string;
+    description: string;
     quantity: number;
     productPrice: number;
     sellingPrice: number;
@@ -52,7 +53,9 @@ interface Address {
 interface BillModel extends mongoose.Document {
     customer: mongoose.Schema.Types.ObjectId;
     products: BillProducts[];
-    totalAmount: number;
+    discount: number;
+    totalAmountBeforeDiscount: number;
+    totalAmountAfterDiscount: number;
     paidAmount: number;
     remainingAmount: number;
     user: mongoose.Schema.Types.ObjectId;
