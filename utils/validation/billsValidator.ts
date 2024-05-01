@@ -25,6 +25,12 @@ export const createBillValidator = [
             }));
             return true;
         }),
+    check("discount")
+        .optional().isNumeric().withMessage("discount must be number").toInt()
+        .custom(async (val: number): Promise<boolean> => {
+            if (val < 0 || val > 100) { return Promise.reject(new Error("discount must be between 0 and 100")); };
+            return true;
+        }),
     validatorMiddleware,
 ];
 
@@ -49,6 +55,12 @@ export const updateBillValidator = [
                 if (!product) { throw new Error(`Product with id ${productId} not found`) };
                 if (productData.productQuantity <= 0 || productData.productQuantity > product.quantity) { throw new Error(`Invalid quantity for product: ${product.name}`); };
             }));
+            return true;
+        }),
+    check("discount")
+        .optional().isNumeric().withMessage("discount must be number").toInt()
+        .custom(async (val: number): Promise<boolean> => {
+            if (val < 0 || val > 100) { return Promise.reject(new Error("discount must be between 0 and 100")); };
             return true;
         }),
     validatorMiddleware,
