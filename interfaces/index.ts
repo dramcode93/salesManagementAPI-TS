@@ -5,16 +5,17 @@ interface CategoryModel extends mongoose.Document {
     name: string;
     shop: mongoose.Schema.Types.ObjectId;
 };
-interface CouponModel extends mongoose.Document{
-    name:string;
-    expire:Date;
-    discount:Number;
+interface CouponModel extends mongoose.Document {
+    name: string;
+    expire: Date;
+    discount: Number;
+    shop: mongoose.Schema.Types.ObjectId;
 };
-interface CartModel extends mongoose.Document{
-cartItems: BillProducts[];
-totalCartPrice:Number;
-totalPriceAfterDiscount:Number;
-user: mongoose.Schema.Types.ObjectId;
+interface CartModel extends mongoose.Document {
+    cartItems: BillProducts[];
+    totalCartPrice: Number;
+    totalPriceAfterDiscount: Number;
+    user: mongoose.Schema.Types.ObjectId;
 };
 interface ProductModel extends mongoose.Document {
     name: string;
@@ -165,4 +166,4 @@ declare module 'express' {
     }
 };
 
-export { CategoryModel,CouponModel,CartModel, ProductModel, UserModel, CustomerModel, BillModel, BillProducts, ShopModel, ShopTypeModel, GovernorateModel, Address, CityModel, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery, EmailOptions, SendEmailOptions };
+export { CategoryModel, CouponModel, CartModel, ProductModel, UserModel, CustomerModel, BillModel, BillProducts, ShopModel, ShopTypeModel, GovernorateModel, Address, CityModel, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery, EmailOptions, SendEmailOptions };

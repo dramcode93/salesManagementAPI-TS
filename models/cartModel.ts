@@ -1,20 +1,21 @@
 import mongoose from "mongoose";
 import { CartModel } from "../interfaces";
-const cartSchema: mongoose.Schema = new mongoose.Schema < CartModel >({
-    cartItems:[{
-        product:{
+const cartSchema: mongoose.Schema = new mongoose.Schema<CartModel>({
+    cartItems: [{
+        product: {
             type: mongoose.Schema.ObjectId,
-            ref:"Product"},
-        quantity:Number,
-        price:Number,
+            ref: "products"
+        },
+        productQuantity: { type: Number },
+        totalPrice: { type: Number },
     }],
-    totalCartPrice:Number,
-    totalPriceAfterDiscount:Number,
-    user:{
-        type:mongoose.Schema.Types.ObjectId,
-        ref:'User',
+    totalCartPrice: { type: Number },
+    totalPriceAfterDiscount: { type: Number },
+    user: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'users',
     },
-},{timestamps:true});
+}, { timestamps: true });
 
 cartSchema.pre<CartModel>('save', async function (next: mongoose.CallbackWithoutResultAndOptionalError): Promise<void> {
     await this.populate({ path: 'cartItems.product', select: 'sellingPrice' });
@@ -23,10 +24,10 @@ cartSchema.pre<CartModel>('save', async function (next: mongoose.CallbackWithout
     for (const item of products) {
         const totalPrice: number = item.product.sellingPrice * item.productQuantity;
         item.totalPrice = totalPrice;
-        total+= totalPrice;
+        total += totalPrice;
     };
     this.totalCartPrice = total;
     next();
 });
 
-export default mongoose.model < CartModel > ("cart", cartSchema);
+export default mongoose.model<CartModel>("carts", cartSchema);

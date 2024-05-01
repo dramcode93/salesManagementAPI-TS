@@ -1,16 +1,16 @@
 import { Router } from "express";
-import { getCoupon,getCoupons,createCoupon,updateCoupon,DeleteCoupon } from "../controllers/coupon";
-import { allowedTo,protectRoutes } from "../controllers/auth";
+import { getCoupon, getCoupons, createCoupon, updateCoupon, DeleteCoupon, filterCoupons } from "../controllers/coupon";
+import { allowedTo, checkActive, protectRoutes } from "../controllers/auth";
 
 const couponRoute: Router = Router();
-couponRoute.use(protectRoutes, allowedTo('admin', 'manager'));
+couponRoute.use(protectRoutes, checkActive);
 
 couponRoute.route('/')
-    .get(getCoupons)
-    .post(createCoupon);
+    .get(filterCoupons, getCoupons)
+    .post(allowedTo('admin'), createCoupon);
 couponRoute.route("/:id")
     .get(getCoupon)
-    .put(updateCoupon)
-    .delete(DeleteCoupon);
+    .put(allowedTo('admin'), updateCoupon)
+    .delete(allowedTo('admin'), DeleteCoupon);
 
 export default couponRoute;
