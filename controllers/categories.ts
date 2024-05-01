@@ -6,7 +6,7 @@ import { createOne, deleteOne, getAll, getAllList, getOne, updateOne } from "./r
 const getCategories = getAll<CategoryModel>(categoriesModel, 'categories');
 const getCategoriesList = getAllList<CategoryModel>(categoriesModel, '');
 const createCategory = createOne<CategoryModel>(categoriesModel);
-const getCategory = getOne<CategoryModel>(categoriesModel);
+const getCategory = getOne<CategoryModel>(categoriesModel, 'categories');
 const updateCategory = updateOne<CategoryModel>(categoriesModel);
 const DeleteCategory = deleteOne<CategoryModel>(categoriesModel);
 
