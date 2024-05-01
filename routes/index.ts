@@ -8,6 +8,7 @@ import usersRoute from "./usersRoute";
 import authRoute from "./authRoute";
 import governoratesRoute from "./governoratesRoute";
 import citiesRoute from "./citiesRoute";
+import couponRoute from "./couponRoute";
 
 const mountRoutes = (app: express.Application) => {
     app.use('/api/categories', categoriesRoute);
@@ -17,6 +18,7 @@ const mountRoutes = (app: express.Application) => {
     app.use('/api/auth', authRoute);
     app.use('/api/governorates', governoratesRoute);
     app.use('/api/cities', citiesRoute);
+    app.use('/api/coupon', couponRoute);
     app.all('*', (req: express.Request, res: express.Response, next: express.NextFunction) => { next(new ApiErrors(`The router ${req.originalUrl} is not found`, 400)) });
     app.use(globalErrors);
 };
