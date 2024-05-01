@@ -36,7 +36,7 @@ billSchema.pre<BillModel>('save', async function (next: mongoose.CallbackWithout
     };
     this.totalAmountBeforeDiscount = total;
     this.remainingAmount = total - this.paidAmount;
-    if (this.discount !== 0) { this.totalAmountAfterDiscount = (this.discount / 100) * this.totalAmountBeforeDiscount; }
+    if (this.discount !== 0) { this.totalAmountAfterDiscount = this.totalAmountBeforeDiscount - (this.discount / 100) * this.totalAmountBeforeDiscount; }
     else { this.totalAmountAfterDiscount = this.totalAmountBeforeDiscount; };
     next();
 });
