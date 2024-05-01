@@ -1,21 +1,22 @@
 import express from "express";
 import expressAsyncHandler from "express-async-handler";
 import shopsModel from "../models/shopsModel";
-import ApiErrors from "../utils/errors";
-import { ShopModel, FilterData } from "../interfaces";
-import { createOne, deleteOne, getAll, getAllList, getOne, updateOne } from "./refactorHandler";
 import usersModel from "../models/usersModel";
+import ApiErrors from "../utils/errors";
+import { ShopModel, FilterData, UserModel } from "../interfaces";
+import { deleteOne, getAll, getAllList, getOne, updateOne } from "./refactorHandler";
+import { sanitizeUser } from "../utils/sanitization";
 
 const getShops = getAll<ShopModel>(shopsModel, 'shops');
 const getShopsList = getAllList<ShopModel>(shopsModel, '');
-const getShop = getOne<ShopModel>(shopsModel);
+const getShop = getOne<ShopModel>(shopsModel, 'shops');
 const updateShop = updateOne<ShopModel>(shopsModel);
 const DeleteShop = deleteOne<ShopModel>(shopsModel);
 
-const createShop = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+const createShop = expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
     const shop: ShopModel = await shopsModel.create(req.body);
-    await usersModel.findByIdAndUpdate(req.user?._id, { shop: shop._id }, { new: true });
-    res.status(201).json({ data: shop });
+    const user: UserModel | null = await usersModel.findByIdAndUpdate(req.user?._id, { shop: shop._id }, { new: true });
+    res.status(201).json({ data: shop, user: sanitizeUser(user) });
 });
 
 const filterShops = (req: express.Request, res: express.Response, next: express.NextFunction): void => {

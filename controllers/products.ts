@@ -9,7 +9,7 @@ import { createOne, deleteOne, getAll, getAllList, getOne, updateOne } from "./r
 const getProducts = getAll<ProductModel>(productsModel, 'products');
 const getProductsList = getAllList<ProductModel>(productsModel, '');
 const createProduct = createOne<ProductModel>(productsModel);
-const getProduct = getOne<ProductModel>(productsModel);
+const getProduct = getOne<ProductModel>(productsModel, 'products');
 const updateProduct = updateOne<ProductModel>(productsModel);
 const DeleteProduct = deleteOne<ProductModel>(productsModel);
 
