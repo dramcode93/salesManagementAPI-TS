@@ -8,8 +8,8 @@ export const createBillValidator = [
     check('customer')
         .notEmpty().withMessage("Customer is required")
         .isMongoId().withMessage("invalid customer id")
-        .custom(async (val: string): Promise<boolean> => {
-            const customer: CustomerModel | null = await customersModel.findById(val);
+        .custom(async (val: string, { req }): Promise<boolean> => {
+            const customer: CustomerModel | null = await customersModel.findOne({ _id: val, shop: req.user.shop });
             if (!customer) { return Promise.reject(new Error('customer does not exist')); };
             return true;
         }),
@@ -25,6 +25,12 @@ export const createBillValidator = [
             }));
             return true;
         }),
+    check("discount")
+        .optional().isNumeric().withMessage("discount must be number").toInt()
+        .custom(async (val: number): Promise<boolean> => {
+            if (val < 0 || val > 100) { return Promise.reject(new Error("discount must be between 0 and 100")); };
+            return true;
+        }),
     validatorMiddleware,
 ];
 
@@ -36,8 +42,8 @@ export const getBillValidator = [
 export const updateBillValidator = [
     check("id").isMongoId().withMessage("Invalid Id"),
     check('customer').optional().isMongoId().withMessage("invalid customer id")
-        .custom(async (val: string): Promise<boolean> => {
-            const customer: CustomerModel | null = await customersModel.findById(val);
+        .custom(async (val: string, { req }): Promise<boolean> => {
+            const customer: CustomerModel | null = await customersModel.findOne({ _id: val, shop: req.user.shop });
             if (!customer) { return Promise.reject(new Error('customer does not exist')); };
             return true;
         }),
@@ -49,6 +55,12 @@ export const updateBillValidator = [
                 if (!product) { throw new Error(`Product with id ${productId} not found`) };
                 if (productData.productQuantity <= 0 || productData.productQuantity > product.quantity) { throw new Error(`Invalid quantity for product: ${product.name}`); };
             }));
+            return true;
+        }),
+    check("discount")
+        .optional().isNumeric().withMessage("discount must be number").toInt()
+        .custom(async (val: number): Promise<boolean> => {
+            if (val < 0 || val > 100) { return Promise.reject(new Error("discount must be between 0 and 100")); };
             return true;
         }),
     validatorMiddleware,

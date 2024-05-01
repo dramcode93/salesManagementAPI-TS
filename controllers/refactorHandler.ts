@@ -4,6 +4,7 @@ import expressAsyncHandler from "express-async-handler";
 import ApiErrors from '../utils/errors';
 import ApiFeatures from '../utils/ApiFeatures';
 import { FilterData } from '../interfaces';
+import { sanitizeUser } from '../utils/sanitization';
 
 export const getAll = <modelType>(model: mongoose.Model<any>, modelName: string) => expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
     let filterData: FilterData = {};
@@ -22,15 +23,19 @@ export const getAll = <modelType>(model: mongoose.Model<any>, modelName: string)
     const apiFeatures: ApiFeatures = new ApiFeatures(model.find(filterData), req.query).filter().sort().limitFields().search(modelName).pagination(documentCount);
     const { mongooseQuery, paginationResult } = apiFeatures;
     const documents: modelType[] = await mongooseQuery;
-    res.status(200).json({ results: documents.length, paginationResult, data: documents });
+    if (modelName === 'users') {
+        const sanitizedUsers = documents.map(user => sanitizeUser(user))
+        res.status(200).json({ results: documents.length, paginationResult, data: sanitizedUsers });
+    }
+    else { res.status(200).json({ results: documents.length, paginationResult, data: documents }); };
 });
 
 export const getAllList = <modelType>(model: mongoose.Model<any>, population: string) => expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
     let filterData: FilterData = {};
     let apiFeatures: ApiFeatures;
     if (req.filterData) { filterData = req.filterData; };
-    if (population !== '') { apiFeatures = new ApiFeatures(model.find(filterData).populate(population), req.query).sort(); }
-    else { apiFeatures = new ApiFeatures(model.find(filterData), req.query).sort(); };
+    if (population !== '') { apiFeatures = new ApiFeatures(model.find(filterData).populate(population), req.query).sort().limitFields(); }
+    else { apiFeatures = new ApiFeatures(model.find(filterData), req.query).sort().limitFields(); };
     const { mongooseQuery } = apiFeatures;
     const documents: modelType[] = await mongooseQuery;
     res.status(200).json({ results: documents.length, data: documents });
@@ -42,10 +47,15 @@ export const createOne = <modelType>(model: mongoose.Model<any>) => expressAsync
     res.status(200).json({ data: document });
 });
 
-export const getOne = <modelType>(model: mongoose.Model<any>) => expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
-    const document: modelType | null = await model.findById(req.params.id);
+export const getOne = <modelType>(model: mongoose.Model<any>, modelName: string) => expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+    // const document: modelType | null = await model.findById(req.params.id);
+    // if (!document) { return next(new ApiErrors(`No document for this id`, 404)); };
+    const apiFeatures: ApiFeatures = new ApiFeatures(model.findById(req.params.id), req.query).limitFields();
+    const { mongooseQuery } = apiFeatures;
+    const document: modelType[] = await mongooseQuery;
     if (!document) { return next(new ApiErrors(`No document for this id`, 404)); };
-    res.status(200).json({ data: document });
+    if (modelName === "users") { res.status(200).json({ data: sanitizeUser(document) }); }
+    else { res.status(200).json({ data: document }); };
 });
 
 export const updateOne = <modelType>(model: mongoose.Model<any>) => expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {

@@ -18,10 +18,14 @@ user: mongoose.Schema.Types.ObjectId;
 };
 interface ProductModel extends mongoose.Document {
     name: string;
+    description: string;
     quantity: number;
     productPrice: number;
     sellingPrice: number;
     sold: number;
+    receivedQuantity: number;
+    badQuantity: number;
+    images: string[];
     category: mongoose.Schema.Types.ObjectId;
     shop: mongoose.Schema.Types.ObjectId;
 };
@@ -46,7 +50,7 @@ interface UserModel extends mongoose.Document {
 interface CustomerModel extends mongoose.Document {
     name: string;
     address: Address[];
-    phone: string;
+    phone: string[];
     shop: mongoose.Schema.Types.ObjectId;
 };
 
@@ -59,7 +63,9 @@ interface Address {
 interface BillModel extends mongoose.Document {
     customer: mongoose.Schema.Types.ObjectId;
     products: BillProducts[];
-    totalAmount: number;
+    discount: number;
+    totalAmountBeforeDiscount: number;
+    totalAmountAfterDiscount: number;
     paidAmount: number;
     remainingAmount: number;
     user: mongoose.Schema.Types.ObjectId;
@@ -74,12 +80,13 @@ interface BillProducts {
 
 interface ShopModel extends mongoose.Document {
     name: string;
-    type: ShopTypeModel;
+    type: ShopTypeModel[];
     address: Address[];
 };
 
 interface ShopTypeModel extends mongoose.Document {
-    type: string;
+    type_ar: string;
+    type_en: string;
 };
 
 interface GovernorateModel extends mongoose.Document {
@@ -98,8 +105,8 @@ interface FilterData {
     category?: string;
     shop?: string | mongoose.Schema.Types.ObjectId;
     user?: string | mongoose.Schema.Types.ObjectId;
-    role?: string;
-    governorate?: string | mongoose.Schema.Types.ObjectId;
+    role?: any;
+    governorate?: any;
 };
 
 // ? @desc Global Errors Interfaces
@@ -154,6 +161,7 @@ declare module 'express' {
         filterData?: FilterData;
         user?: UserModel;
         newToken?: string;
+        files?: any;
     }
 };
 

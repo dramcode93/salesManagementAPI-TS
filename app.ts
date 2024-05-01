@@ -16,7 +16,8 @@ app.use(cors());
 app.use(compression());
 app.use(ExpressMongoSanitize());
 app.use(helmet());
-app.use(hpp({ whitelist: ['name', 'quantity', 'productPrice', 'sellingPrice', 'sold', 'customerName'] })); // ! Protect against HTTP parameters poll
+app.use(hpp({ whitelist: ['type'] })); // ! Protect against HTTP parameters poll
+app.use(express.static('uploads'));
 dotenv.config();
 
 const port = process.env.PORT;

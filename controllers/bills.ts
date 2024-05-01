@@ -14,7 +14,7 @@ const filterBills = (req: express.Request, res: express.Response, next: express.
 };
 
 const getBills = getAll(billsModel, 'bills');
-const getBill = getOne(billsModel);
+const getBill = getOne(billsModel, 'bills');
 const deleteBill = deleteOne(billsModel);
 
 interface UpdateProduct { quantity: number; sold: number };

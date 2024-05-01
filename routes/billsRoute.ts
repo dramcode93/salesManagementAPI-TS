@@ -2,9 +2,10 @@ import { Router } from "express";
 import { createBill, deleteBill, filterBills, getBill, getBills, updateBill } from "../controllers/bills";
 import { createBillValidator, deleteBillValidator, getBillValidator, updateBillValidator } from "../utils/validation/billsValidator";
 import { allowedTo, checkActive, protectRoutes } from "../controllers/auth";
+import { checkShops } from "../controllers/shops";
 
 const billsRoute = Router();
-billsRoute.use(protectRoutes, checkActive);
+billsRoute.use(protectRoutes, checkActive, checkShops);
 
 billsRoute.route('/')
     .get(allowedTo('admin', 'user'), filterBills, getBills)
