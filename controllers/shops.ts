@@ -36,4 +36,32 @@ const checkCreateShop = (req: express.Request, res: express.Response, next: expr
     next();
 };
 
-export { getShops, getShopsList, createShop, getShop, updateShop, DeleteShop, checkShops, checkCreateShop };
+const addShopType = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+    const shop: ShopModel | null = await shopsModel.findById(req.params.id);
+    if (!shop) { return next(new ApiErrors('no shop for this Id', 404)); };
+    await shopsModel.findByIdAndUpdate(shop._id, { $addToSet: { type: req.body.type } }, { new: true });
+    res.status(200).json({ message: 'shop type added successfully' });
+});
+
+const addShopAddress = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+    const shop: ShopModel | null = await shopsModel.findById(req.params.id);
+    if (!shop) { return next(new ApiErrors('no shop for this Id', 404)); };
+    await shopsModel.findByIdAndUpdate(shop._id, { $addToSet: { address: req.body.address } }, { new: true });
+    res.status(200).json({ message: 'shop address added successfully' });
+});
+
+const deleteShopType = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+    const shop: ShopModel | null = await shopsModel.findById(req.params.id);
+    if (!shop) { return next(new ApiErrors('no shop for this Id', 404)); };
+    await shopsModel.findByIdAndUpdate(shop._id, { $pull: { type: req.body.type } }, { new: true });
+    res.status(200).json({ message: 'shop type deleted successfully' });
+});
+
+const deleteShopAddress = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+    const shop: ShopModel | null = await shopsModel.findById(req.params.id);
+    if (!shop) { return next(new ApiErrors('no shop for this Id', 404)); };
+    await shopsModel.findByIdAndUpdate(shop._id, { $pull: { address: req.body.address } }, { new: true });
+    res.status(200).json({ message: 'shop address deleted successfully' });
+});
+
+export { getShops, getShopsList, createShop, getShop, updateShop, DeleteShop, checkShops, checkCreateShop, addShopType, addShopAddress, deleteShopType, deleteShopAddress };
