@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { DeleteProduct, addProductCategory, createProduct, filterProducts, getProduct, getProducts, getProductsList, resizeImage, updateProduct, uploadProductImages } from "../controllers/products";
-import { createProductValidator, deleteProductValidator, getProductValidator, updateProductValidator } from "../utils/validation/productsValidator";
+import { DeleteProduct, addProductCategory, addProductImages, createProduct, deleteProductImage, filterProducts, getProduct, getProducts, getProductsList, resizeImage, updateProduct, uploadProductImages } from "../controllers/products";
+import { ProductImagesValidator, createProductValidator, deleteProductValidator, getProductValidator, updateProductValidator } from "../utils/validation/productsValidator";
 import { allowedTo, checkActive, protectRoutes } from "../controllers/auth";
 import { checkShops } from "../controllers/shops";
 
@@ -17,5 +17,10 @@ productsRoute.route("/:id")
     .get(allowedTo('admin', 'user', 'customer'), getProductValidator, getProduct)
     .put(allowedTo('admin'), updateProductValidator, updateProduct)
     .delete(allowedTo('admin'), deleteProductValidator, DeleteProduct);
+
+productsRoute.use(allowedTo('admin', 'user'));
+productsRoute.route("/:id/images")
+    .put(getProductValidator, uploadProductImages, resizeImage, ProductImagesValidator, addProductImages)
+    .delete(getProductValidator, deleteProductImage);
 
 export default productsRoute;

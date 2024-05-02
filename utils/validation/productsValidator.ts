@@ -1,7 +1,9 @@
+import fs from "fs";
 import { check } from "express-validator";
 import validatorMiddleware from "../../middlewares/validatorMiddleware";
 import categoriesModel from "../../models/categoriesModel";
-import { CategoryModel } from "../../interfaces";
+import productsModel from "../../models/productsModel";
+import { CategoryModel, ProductModel } from "../../interfaces";
 
 export const createProductValidator = [
     check('name')
@@ -54,7 +56,40 @@ export const updateProductValidator = [
     validatorMiddleware
 ];
 
-export const deleteProductValidator = [
-    check('id').isMongoId().withMessage("invalid product id"),
+export const ProductImagesValidator = [
+    check('images').notEmpty().withMessage('product images is required')
+        .custom(async (images: string[], { req }): Promise<boolean> => {
+            const product: ProductModel | null = await productsModel.findById(req.params?.id);
+            if (!product) { deleteUploadedImages(images); return Promise.reject(new Error("Product not found")); };
+            const imagesDifference: number = 5 - product.images.length;
+            if (product.images.length >= 5) { deleteUploadedImages(images); return Promise.reject(new Error("every product has 5 images only, you can't add more")); };
+            if (product.images.length + images.length >= 5) { deleteUploadedImages(images); return Promise.reject(new Error(`every product has 5 images only, you can add only ${imagesDifference} more`)); };
+            return true;
+        }),
     validatorMiddleware
 ];
+
+export const deleteProductValidator = [
+    check('id').isMongoId().withMessage("invalid product id")
+        .custom(async (id: string): Promise<boolean> => {
+            const product: ProductModel | null = await productsModel.findById(id);
+            const productImages: string[] = [];
+            product?.images.forEach((imageUrl: string): void => {
+                const image: string = imageUrl.split(`${process.env.Base_URL}/products/`)[1];
+                productImages.push(image);
+            });
+            deleteUploadedImages(productImages);
+            return true;
+        }),
+    validatorMiddleware
+];
+
+export const deleteUploadedImages = (images: string[]): void => {
+    images.forEach((imageName: string): void => {
+        const imagePath: string = `uploads/products/${imageName}`;
+        fs.unlink(imagePath, (err): void => {
+            if (err) { console.error(`Error deleting image ${imageName}: ${err}`); }
+            else { console.log(`Successfully deleted image ${imageName}`); };
+        });
+    });
+};
