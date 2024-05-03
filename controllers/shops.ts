@@ -9,7 +9,7 @@ import { sanitizeUser } from "../utils/sanitization";
 
 const getShops = getAll<ShopModel>(shopsModel, 'shops');
 const getShopsList = getAllList<ShopModel>(shopsModel, '');
-const getShop = getOne<ShopModel>(shopsModel, 'shops');
+const getShop = getOne<ShopModel>(shopsModel, 'shops', '');
 const updateShop = updateOne<ShopModel>(shopsModel);
 const DeleteShop = deleteOne<ShopModel>(shopsModel);
 

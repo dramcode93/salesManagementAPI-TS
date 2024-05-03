@@ -5,7 +5,7 @@ import { createOne, deleteOne, getAll, getOne, updateOne } from "./refactorHandl
 
 const getCoupons = getAll<CouponModel>(couponModel, 'coupons');
 const createCoupon = createOne<CouponModel>(couponModel);
-const getCoupon = getOne<CouponModel>(couponModel, 'coupons');
+const getCoupon = getOne<CouponModel>(couponModel, 'coupons', '');
 const updateCoupon = updateOne<CouponModel>(couponModel);
 const DeleteCoupon = deleteOne<CouponModel>(couponModel);
 
