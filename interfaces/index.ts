@@ -63,6 +63,8 @@ interface Address {
 
 interface BillModel extends mongoose.Document {
     customer: mongoose.Schema.Types.ObjectId;
+    customerName: string;
+    code: string;
     products: BillProducts[];
     discount: number;
     totalAmountBeforeDiscount: number;
@@ -128,7 +130,6 @@ interface QueryString {
 
 interface SearchQuery {
     $or?: Array<{ [key: string]: RegExp }>;
-    customer?: RegExp;
     name?: RegExp;
     role?: RegExp;
 }

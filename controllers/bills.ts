@@ -3,8 +3,9 @@ import expressAsyncHandler from "express-async-handler";
 import ApiErrors from "../utils/errors";
 import billsModel from "../models/billsModel";
 import productsModel from "../models/productsModel";
+import customersModel from "../models/customersModel";
 import { deleteOne, getAll, getOne } from "./refactorHandler";
-import { BillModel, BillProducts, FilterData } from "../interfaces";
+import { BillModel, BillProducts, CustomerModel, FilterData } from "../interfaces";
 
 const filterBills = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
     let filterData: FilterData = {};
@@ -25,6 +26,10 @@ const createBill = expressAsyncHandler(async (req: express.Request, res: express
     req.body.user = req.user?._id;
     req.body.shop = req.user?.shop;
     const bill: BillModel = await billsModel.create(req.body);
+    const customer: CustomerModel | null = await customersModel.findById(bill.customer);
+    bill.customerName = customer!.name;
+    bill.code = bill._id.toString();
+    await bill.save();
     res.status(200).json({ data: bill });
 });
 

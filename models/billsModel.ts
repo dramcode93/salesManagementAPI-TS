@@ -7,6 +7,8 @@ const billSchema: mongoose.Schema = new mongoose.Schema<BillModel>({
         ref: 'customers',
         required: [true, 'customer id is required'],
     },
+    customerName: { type: String, },
+    code: { type: String, },
     products: [{
         product: {
             type: mongoose.Schema.Types.ObjectId,
@@ -35,9 +37,9 @@ billSchema.pre<BillModel>('save', async function (next: mongoose.CallbackWithout
         total += totalPrice;
     };
     this.totalAmountBeforeDiscount = total;
-    this.remainingAmount = total - this.paidAmount;
     if (this.discount !== 0) { this.totalAmountAfterDiscount = this.totalAmountBeforeDiscount - (this.discount / 100) * this.totalAmountBeforeDiscount; }
     else { this.totalAmountAfterDiscount = this.totalAmountBeforeDiscount; };
+    this.remainingAmount = this.totalAmountAfterDiscount - this.paidAmount;
     next();
 });
 
