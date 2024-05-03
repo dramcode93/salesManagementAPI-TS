@@ -6,7 +6,7 @@ const cartSchema: mongoose.Schema = new mongoose.Schema<CartModel>({
             type: mongoose.Schema.ObjectId,
             ref: "products"
         },
-        productQuantity: { type: Number },
+        productQuantity: { type: Number ,default:1},
         totalPrice: { type: Number },
     }],
     totalCartPrice: { type: Number },

@@ -9,6 +9,7 @@ import authRoute from "./authRoute";
 import governoratesRoute from "./governoratesRoute";
 import citiesRoute from "./citiesRoute";
 import couponRoute from "./couponRoute";
+import cartRoute from "./cartRoute";
 import customersRoute from "./customersRoute";
 import shopsRoute from "./shopsRoute";
 import shopTypesRoute from "./shopTypesRoute";
@@ -22,6 +23,7 @@ const mountRoutes = (app: express.Application): void => {
     app.use('/api/governorates', governoratesRoute);
     app.use('/api/cities', citiesRoute);
     app.use('/api/coupon', couponRoute);
+    app.use('/api/cart', cartRoute);
     app.use('/api/customers', customersRoute);
     app.use('/api/shops', shopsRoute);
     app.use('/api/shopTypes', shopTypesRoute);
