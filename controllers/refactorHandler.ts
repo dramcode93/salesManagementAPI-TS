@@ -47,10 +47,12 @@ export const createOne = <modelType>(model: mongoose.Model<any>) => expressAsync
     res.status(200).json({ data: document });
 });
 
-export const getOne = <modelType>(model: mongoose.Model<any>, modelName: string) => expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+export const getOne = <modelType>(model: mongoose.Model<any>, modelName: string, population: string) => expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     // const document: modelType | null = await model.findById(req.params.id);
     // if (!document) { return next(new ApiErrors(`No document for this id`, 404)); };
-    const apiFeatures: ApiFeatures = new ApiFeatures(model.findById(req.params.id), req.query).limitFields();
+    let apiFeatures: ApiFeatures;
+    if (population !== '') { apiFeatures = new ApiFeatures(model.findById(req.params.id).populate(population), req.query).limitFields(); }
+    else { apiFeatures = new ApiFeatures(model.findById(req.params.id), req.query).limitFields(); };
     const { mongooseQuery } = apiFeatures;
     const document: modelType[] = await mongooseQuery;
     if (!document) { return next(new ApiErrors(`No document for this id`, 404)); };

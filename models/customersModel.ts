@@ -19,7 +19,9 @@ const customerSchema: mongoose.Schema = new mongoose.Schema<CustomerModel>({
         type: mongoose.Types.ObjectId,
         ref: "shops"
     }
-}, { timestamps: true });
+}, { timestamps: true, toJSON: { virtuals: true }, toObject: { virtuals: true } });
+
+customerSchema.virtual("bills", { ref: "bills", foreignField: "customer", localField: "_id" });
 
 customerSchema.pre<CustomerModel>(/^find/, function (next: mongoose.CallbackWithoutResultAndOptionalError): void {
     this.populate({ path: 'address.governorate' });

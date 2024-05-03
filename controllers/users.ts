@@ -9,7 +9,7 @@ import { sanitizeUser } from '../utils/sanitization';
 import ApiErrors from '../utils/errors';
 
 const getUsers = getAll<UserModel>(usersModel, 'users');
-const getUser = getOne<UserModel>(usersModel, 'users');
+const getUser = getOne<UserModel>(usersModel, 'users', '');
 
 const createUser = expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
     const user: UserModel | undefined = req.user;

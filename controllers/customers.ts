@@ -6,7 +6,7 @@ import { createOne, deleteOne, getAll, getAllList, getOne, updateOne } from "./r
 const getCustomers = getAll<CustomerModel>(CustomersModel, 'customers');
 const getCustomersList = getAllList<CustomerModel>(CustomersModel, '');
 const createCustomer = createOne<CustomerModel>(CustomersModel);
-const getCustomer = getOne<CustomerModel>(CustomersModel, 'customers');
+const getCustomer = getOne<CustomerModel>(CustomersModel, 'customers', 'bills');
 const updateCustomer = updateOne<CustomerModel>(CustomersModel);
 const deleteCustomer = deleteOne<CustomerModel>(CustomersModel);
 
