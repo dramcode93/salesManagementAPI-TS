@@ -25,6 +25,12 @@ export const createBillValidator = [
             }));
             return true;
         }),
+    check("paidAmount")
+        .notEmpty().withMessage("paid amount is required").isNumeric().withMessage("paid amount must be number")
+        .custom(async (val: number): Promise<boolean> => {
+            if (val <= 0) { return Promise.reject(new Error("paid amount must be greater than 0")); };
+            return true;
+        }),
     check("discount")
         .optional().isNumeric().withMessage("discount must be number").toInt()
         .custom(async (val: number): Promise<boolean> => {
@@ -55,6 +61,12 @@ export const updateBillValidator = [
                 if (!product) { throw new Error(`Product with id ${productId} not found`) };
                 if (productData.productQuantity <= 0 || productData.productQuantity > product.quantity) { throw new Error(`Invalid quantity for product: ${product.name}`); };
             }));
+            return true;
+        }),
+    check("paidAmount")
+        .notEmpty().withMessage("paid amount is required").isNumeric().withMessage("paid amount must be number")
+        .custom(async (val: number): Promise<boolean> => {
+            if (val <= 0) { return Promise.reject(new Error("paid amount must be greater than 0")); };
             return true;
         }),
     check("discount")

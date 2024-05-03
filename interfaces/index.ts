@@ -127,8 +127,8 @@ interface QueryString {
 };
 
 interface SearchQuery {
-    $or?: {}[];
-    customerName?: RegExp;
+    $or?: Array<{ [key: string]: RegExp }>;
+    customer?: RegExp;
     name?: RegExp;
     role?: RegExp;
 }
