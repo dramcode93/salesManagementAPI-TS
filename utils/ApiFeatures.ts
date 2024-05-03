@@ -37,7 +37,12 @@ class ApiFeatures {
     search(modelName: string) {
         if (this.queryString.search) {
             let query: SearchQuery = {};
-            if (modelName === "bills") { query = { customer: new RegExp(this.queryString.search, "i") }; }
+            if (modelName === "bills") {
+                query.$or = [
+                    { customerName: new RegExp(this.queryString.search, "i") },
+                    { code: new RegExp(this.queryString.search, "i") },
+                ];
+            }
             else if (modelName === 'users') {
                 query.$or = [
                     { name: new RegExp(this.queryString.search, "i") },
