@@ -13,7 +13,7 @@ interface CouponModel extends mongoose.Document {
 };
 interface CartModel extends mongoose.Document {
     cartItems: BillProducts[];
-    totalCartPrice: Number;
+    totalCartPrice: number;
     totalPriceAfterDiscount: Number;
     user: mongoose.Schema.Types.ObjectId;
 };
