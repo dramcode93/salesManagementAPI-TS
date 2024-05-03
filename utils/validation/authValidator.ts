@@ -18,8 +18,8 @@ export const signupValidator = [
         .notEmpty().withMessage("product name is required")
         .isLength({ min: 2, max: 50 }).withMessage("name length must be between 2 and 50"),
     check('email').notEmpty().withMessage('Email is required').isEmail().withMessage('Invalid email'),
-    check('phone').notEmpty().withMessage('phone is required').isArray().isMobilePhone('ar-EG').withMessage('Invalid phone number'),
-    check('address').optional().isArray().withMessage('Invalid address')
+    check('phone').notEmpty().withMessage('phone is required').isMobilePhone('ar-EG').withMessage('Invalid phone number'),
+    check('address').optional()
         .custom(async (address: Address[]): Promise<boolean> => {
             await Promise.all(address.map(async (item: Address): Promise<void> => {
                 const governorate: GovernorateModel | null = await governoratesModel.findById(item.governorate);

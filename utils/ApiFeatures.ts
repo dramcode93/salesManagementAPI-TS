@@ -37,7 +37,7 @@ class ApiFeatures {
     search(modelName: string) {
         if (this.queryString.search) {
             let query: SearchQuery = {};
-            if (modelName === "bills") { query = { customerName: new RegExp(this.queryString.search, "i") }; }
+            if (modelName === "bills") { query = { customer: new RegExp(this.queryString.search, "i") }; }
             else if (modelName === 'users') {
                 query.$or = [
                     { name: new RegExp(this.queryString.search, "i") },
@@ -45,7 +45,7 @@ class ApiFeatures {
                 ];
             }
             else { query = { name: new RegExp(this.queryString.search, "i") }; };
-            this.mongooseQuery = this.mongooseQuery.find(query)
+            this.mongooseQuery = this.mongooseQuery.find(query);
         };
         return this;
     };
