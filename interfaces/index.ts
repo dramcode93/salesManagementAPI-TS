@@ -16,6 +16,7 @@ interface CartModel extends mongoose.Document {
     totalCartPrice: number;
     totalPriceAfterDiscount: Number;
     user: mongoose.Schema.Types.ObjectId;
+    shop: mongoose.Schema.Types.ObjectId
 };
 interface ProductModel extends mongoose.Document {
     name: string;
@@ -79,6 +80,7 @@ interface BillProducts {
     product: ProductModel;
     productQuantity: number;
     totalPrice: number;
+    shop: mongoose.Schema.Types.ObjectId;
 };
 
 interface ShopModel extends mongoose.Document {

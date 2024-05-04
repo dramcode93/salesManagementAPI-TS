@@ -3,12 +3,12 @@ import { addToProductCart, getLoggedUserCart, removeSpecificCartItem, clearLogge
 import { allowedTo, checkActive, protectRoutes } from "../controllers/auth";
 
 const cartRoute = Router();
-cartRoute.use(protectRoutes, checkActive);
+cartRoute.use(protectRoutes, checkActive), allowedTo('customer');
 
 cartRoute.route('/')
-    .post(allowedTo('customer'), addToProductCart)
+    .post( addToProductCart)
     .get(getLoggedUserCart)
     .delete(clearLoggedUserCart);
 cartRoute.put("/cartRoute",applyCoupons);
-cartRoute.route('/:itemId').put(updateCartItemQuantity).delete(removeSpecificCartItem);
+cartRoute.route('/:id').put(updateCartItemQuantity).delete(removeSpecificCartItem);
 export default cartRoute;

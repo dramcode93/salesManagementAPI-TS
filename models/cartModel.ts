@@ -15,6 +15,10 @@ const cartSchema: mongoose.Schema = new mongoose.Schema<CartModel>({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users',
     },
+    shop: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'shops'
+    }
 }, { timestamps: true });
 
 cartSchema.pre<CartModel>('save', async function (next: mongoose.CallbackWithoutResultAndOptionalError): Promise<void> {
