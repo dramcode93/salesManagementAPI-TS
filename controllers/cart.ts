@@ -30,7 +30,9 @@ export const addToProductCart = expressAsyncHandler(async (req: express.Request,
             // Product does not exist in the cart, push it to the cart
             // Add your shop comparison logic here
             const existingProduct: ProductModel | null = await products.findById(cart.cartItems[0].product);
-            if (existingProduct?.shop === product?.shop) {
+            console.log(product?.shop);
+            console.log(existingProduct?.shop);
+            if (existingProduct?.shop.toString() === product?.shop.toString()) {
                 cart.cartItems.push({ product: productId });
             } else {
                 return next(new ApiErrors('cannot add product from a different shop.', 400));
@@ -55,7 +57,7 @@ export const getLoggedUserCart = expressAsyncHandler(async (req: express.Request
 export const removeSpecificCartItem = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     const cart: any = await carts.findOneAndUpdate({ user: req.user?._id },
         {
-            $pull: { cartItems: { _id: req.params.itemId } }
+            $pull: { cartItems: { _id: req.params.id } }
         },
         { new: true });
     res.status(200).json({ status: 'success', numOfCartItems: cart.cartItems.length, data: cart });
@@ -68,17 +70,17 @@ export const clearLoggedUserCart = expressAsyncHandler(async (req: express.Reque
 
 export const updateCartItemQuantity = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     const quantity: number = req.body.productQuantity;
-    const cart: any = await carts.findOne({ user: req.user?._id });
+    const cart: CartModel |null = await carts.findOne({ user: req.user?._id });
     if (!cart) {
         return next(new ApiErrors(`there is no cart for this user id :${req.user?._id}`, 404))
     }
-    const itemIndex: number = cart.cartItems.findIndex((item: any) => item._id.toString() == req.params.itemId);
+    const itemIndex: number = cart.cartItems.findIndex((item:BillProducts) => item.product.toString() === req.params.id.toString());
     if (itemIndex > -1) {
         const cartItem: BillProducts = cart.cartItems[itemIndex];
-        cartItem.productQuantity += quantity;
+        cartItem.productQuantity = quantity;
         cart.cartItems[itemIndex] = cartItem;
     } else {
-        return next(new ApiErrors(`there is no item for this id :${req.params.itemId}`, 404))
+        return next(new ApiErrors(`there is no item for this id :${req.params.id}`, 404))
     }
     await cart.save();
     res.status(200).json({ status: "success", numberOfCartItems: cart.cartItems.length, data: cart });
