@@ -2,6 +2,7 @@ import { Router } from "express";
 import { addToProductCart, getLoggedUserCart, removeSpecificCartItem, clearLoggedUserCart, updateCartItemQuantity, applyCoupons } from "../controllers/cart";
 import { allowedTo, checkActive, protectRoutes } from "../controllers/auth";
 import {getLoggedUserCartValidator,
+    createProductInCartValidator,
     updateCartItemQuantityValidator,
     removeSpecificCartItemValidator,
     clearLoggedUserCartValidator
@@ -10,7 +11,7 @@ const cartRoute = Router();
 cartRoute.use(protectRoutes, checkActive), allowedTo('customer');
 
 cartRoute.route('/')
-    .post(addToProductCart)
+    .post(createProductInCartValidator,addToProductCart)
     .get(getLoggedUserCart)
     .delete(clearLoggedUserCartValidator,clearLoggedUserCart);
 cartRoute.put("/cartRoute",applyCoupons);
