@@ -69,7 +69,7 @@ export const clearLoggedUserCart = expressAsyncHandler(async (req: express.Reque
 });
 
 export const updateCartItemQuantity = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
-    const quantity: number = req.body.productQuantity;
+    const productQuantity: number = req.body.productQuantity;
     const cart: CartModel |null = await carts.findOne({ user: req.user?._id });
     if (!cart) {
         return next(new ApiErrors(`there is no cart for this user id :${req.user?._id}`, 404))
@@ -77,7 +77,7 @@ export const updateCartItemQuantity = expressAsyncHandler(async (req: express.Re
     const itemIndex: number = cart.cartItems.findIndex((item:BillProducts) => item.product.toString() === req.params.id.toString());
     if (itemIndex > -1) {
         const cartItem: BillProducts = cart.cartItems[itemIndex];
-        cartItem.productQuantity = quantity;
+        cartItem.productQuantity = productQuantity;
         cart.cartItems[itemIndex] = cartItem;
     } else {
         return next(new ApiErrors(`there is no item for this id :${req.params.id}`, 404))
