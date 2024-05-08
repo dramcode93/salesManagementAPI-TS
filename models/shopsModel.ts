@@ -20,11 +20,11 @@ const shopSchema: mongoose.Schema = new mongoose.Schema<ShopModel>({
     }]
 }, { timestamps: true });
 
-// shopSchema.pre<ShopModel>(/^find/, function (next: mongoose.CallbackWithoutResultAndOptionalError): void {
-//     this.populate({ path: 'type' });
-//     this.populate({ path: 'address.governorate' });
-//     this.populate({ path: 'address.city' });
-//     next();
-// });
+shopSchema.pre<ShopModel>(/^find/, function (next: mongoose.CallbackWithoutResultAndOptionalError): void {
+    // this.populate({ path: 'type' });
+    this.populate({ path: 'address.governorate' });
+    this.populate({ path: 'address.city' });
+    next();
+});
 
 export default mongoose.model<ShopModel>("shops", shopSchema);
