@@ -6,7 +6,7 @@ const cartSchema: mongoose.Schema = new mongoose.Schema<CartModel>({
             type: mongoose.Schema.ObjectId,
             ref: "products"
         },
-        productQuantity: { type: Number ,default:1},
+        productQuantity: { type: Number, default: 1 },
         totalPrice: { type: Number },
     }],
     totalCartPrice: { type: Number },
@@ -15,9 +15,9 @@ const cartSchema: mongoose.Schema = new mongoose.Schema<CartModel>({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'users',
     },
-    shop: {
+    coupon: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'shops'
+        ref: 'coupons',
     }
 }, { timestamps: true });
 
@@ -31,6 +31,11 @@ cartSchema.pre<CartModel>('save', async function (next: mongoose.CallbackWithout
         total += totalPrice;
     };
     this.totalCartPrice = total;
+    next();
+});
+
+cartSchema.pre<CartModel>(/^find/, function (next: mongoose.CallbackWithoutResultAndOptionalError): void {
+    this.populate({ path: 'cartItems.product', select: 'name sellingPrice images shop' });
     next();
 });
 

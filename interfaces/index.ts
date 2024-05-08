@@ -8,15 +8,15 @@ interface CategoryModel extends mongoose.Document {
 interface CouponModel extends mongoose.Document {
     name: string;
     expire: Date;
-    discount: Number;
+    discount: number;
     shop: mongoose.Schema.Types.ObjectId;
 };
 interface CartModel extends mongoose.Document {
     cartItems: BillProducts[];
     totalCartPrice: number;
-    totalPriceAfterDiscount: Number;
+    totalPriceAfterDiscount: number;
     user: mongoose.Schema.Types.ObjectId;
-    shop: mongoose.Schema.Types.ObjectId
+    coupon: mongoose.Schema.Types.ObjectId;
 };
 interface ProductModel extends mongoose.Document {
     name: string;
@@ -80,7 +80,6 @@ interface BillProducts {
     product: ProductModel;
     productQuantity: number;
     totalPrice: number;
-    shop: mongoose.Schema.Types.ObjectId;
 };
 
 interface ShopModel extends mongoose.Document {

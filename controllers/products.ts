@@ -21,7 +21,7 @@ const addProductCategory = (req: express.Request, res: express.Response, next: e
 
 const filterProducts = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
     let filterData: FilterData = {};
-    if (req.user?.role !== 'customer') { filterData.shop = req.user?.shop; };
+    if (req.user) { if (req.user.role !== 'customer') { filterData.shop = req.user?.shop; }; };
     if (req.params.categoryId) { filterData.category = req.params.categoryId };
     if (req.params.shopId) { filterData.shop = req.params.shopId }; // * for customers in e-commerce to get shop products
     req.filterData = filterData;

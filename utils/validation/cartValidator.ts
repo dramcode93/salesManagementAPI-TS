@@ -1,53 +1,26 @@
 import { check } from "express-validator";
 import validatorMiddleware from "../../middlewares/validatorMiddleware";
-import carts from "../../models/cartModel";
-import productModel from "../../models/productsModel"
-import { ProductModel, CartModel, BillProducts, CouponModel } from "../../interfaces";
+import productModel from "../../models/productsModel";
+import { ProductModel } from "../../interfaces";
 
 export const createProductInCartValidator = [
-    check("productId")
-        .notEmpty().withMessage("Products are required")
-        .custom(async (cartItems: BillProducts[] | any, { req }): Promise<boolean> => {
-            const productId: string = req.body.productId;
-            const product: ProductModel | null = await productModel.findById(productId);
-            if (!product) { throw new Error(`Product with id ${productId} not found`) };
-            if (product!.quantity > cartItems.productQuantity) {
-                throw new Error(`invalid quantity for this product `)
-            }
-            return true
-        })
-
-
-    , validatorMiddleware
-];
-
-export const getLoggedUserCartValidator = [
-    check('id').isMongoId().withMessage("Invalid Id")
-    , validatorMiddleware
+    check("productId").notEmpty().withMessage("Product is required").isMongoId().withMessage("invalid product id"),
+    validatorMiddleware
 ];
 
 export const updateCartItemQuantityValidator = [
-    check('id').isMongoId().withMessage("invalid product id"),
-    check('productQuantity').notEmpty().withMessage("product quantity is required")
-        .custom(async (val: any, { req }): Promise<boolean> => {
-            const productQuantity: number = req.body.productQuantity;
-            const productId: string = req.params?.id;
-            const product: any = await productModel.findById(productId);
-            if (product?.quantity <= 0 || product?.quantity < productQuantity) {
-                throw new Error(`invalid quantity for this product:${req.params?.id}`);
-            }
+    check('id').notEmpty().withMessage("Product is required").isMongoId().withMessage("invalid product id"),
+    check('productQuantity').notEmpty().withMessage("product quantity is required").isNumeric().withMessage("product quantity must be number").toInt()
+        .custom(async (productQuantity: number, { req }): Promise<boolean> => {
+            const product: ProductModel | null = await productModel.findById(req.params?.id);
+            if (!product) { return Promise.reject(new Error("product not found")); };
+            if (product.quantity <= 0 || product.quantity < productQuantity) { throw new Error(`invalid quantity for product : ${product.name}`); };
             return true;
         }),
-
     validatorMiddleware
 ];
 
 export const removeSpecificCartItemValidator = [
-    check('id').isMongoId().withMessage("Invalid Id"),
-    validatorMiddleware,
-];
-
-export const clearLoggedUserCartValidator = [
     check('id').isMongoId().withMessage("Invalid Id"),
     validatorMiddleware,
 ];
