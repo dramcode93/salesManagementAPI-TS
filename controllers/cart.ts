@@ -30,7 +30,7 @@ export const addToProductCart = expressAsyncHandler(async (req: express.Request,
                 const existingProduct: ProductModel | null = await products.findById(cart.cartItems[0].product._id);
                 if (existingProduct?.shop.toString() === product.shop.toString()) { cart.cartItems.push({ product: productId }); }
                 else { return next(new ApiErrors('cannot add product from a different shop.', 400)); };
-            };
+            } else { cart.cartItems.push({ product: productId }); };
         };
         await cart.save();
     };
@@ -45,6 +45,7 @@ export const getLoggedUserCart = expressAsyncHandler(async (req: express.Request
 
 export const removeSpecificCartItem = expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
     const cart: CartModel | null = await carts.findOneAndUpdate({ user: req.user?._id }, { $pull: { cartItems: { _id: req.params.id } } }, { new: true });
+    await cart?.save();
     res.status(200).json({ status: 'success', numOfCartItems: cart!.cartItems.length, data: cart });
 });
 
