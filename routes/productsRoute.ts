@@ -6,15 +6,18 @@ import { checkShops } from "../controllers/shops";
 
 const productsRoute: Router = Router({ mergeParams: true });
 
-productsRoute.route('/').get(filterProducts, getProducts);
+productsRoute.route('/customers').get(filterProducts, getProducts);
+productsRoute.route('/customers/:id').get(getProductValidator, getProduct);
 productsRoute.use(protectRoutes, checkActive, checkShops);
 
-productsRoute.route('/').post(allowedTo('admin'), uploadProductImages, resizeImage, addProductCategory, createProductValidator, createProduct);
+productsRoute.route('/')
+    .get(allowedTo('admin', 'user'), filterProducts, getProducts)
+    .post(allowedTo('admin'), uploadProductImages, resizeImage, addProductCategory, createProductValidator, createProduct);
 
 productsRoute.get('/list', allowedTo('admin', 'user'), filterProducts, getProductsList);
 
 productsRoute.route("/:id")
-    .get(allowedTo('admin', 'user', 'customer'), getProductValidator, getProduct)
+    .get(allowedTo('admin', 'user'), getProductValidator, getProduct)
     .put(allowedTo('admin'), updateProductValidator, updateProduct)
     .delete(allowedTo('admin'), deleteProductValidator, DeleteProduct);
 
