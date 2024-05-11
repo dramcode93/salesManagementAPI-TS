@@ -81,6 +81,17 @@ interface BillProducts {
     productQuantity: number;
     totalPrice: number;
 };
+interface orderModel extends mongoose.Document {
+    user: mongoose.Schema.Types.ObjectId;
+    cartItems: BillProducts[];
+    shippingPrice: number;
+    totalOrderPrice: number;
+    paymentMethodType: String;
+    isPaid: Boolean;
+    paidAt: Date;
+    isDelivered: Boolean;
+    deliveredAt: Date;
+};
 
 interface ShopModel extends mongoose.Document {
     name: string;
@@ -168,4 +179,4 @@ declare module 'express' {
     }
 };
 
-export { CategoryModel, CouponModel, CartModel, ProductModel, UserModel, CustomerModel, BillModel, BillProducts, ShopModel, ShopTypeModel, GovernorateModel, Address, CityModel, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery, EmailOptions, SendEmailOptions };
+export { CategoryModel, CouponModel, CartModel, ProductModel, UserModel, CustomerModel, BillModel, BillProducts, orderModel, ShopModel, ShopTypeModel, GovernorateModel, Address, CityModel, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery, EmailOptions, SendEmailOptions };
