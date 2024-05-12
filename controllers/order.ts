@@ -1,12 +1,12 @@
 import express from 'express';
 import expressAsyncHandler from "express-async-handler";
 import ApiErrors from "../utils/errors";
-import { createOne, deleteOne, getAll, getAllList, getOne, updateOne } from "./refactorHandler";
+import { getAll, getOne } from "./refactorHandler";
 import ordersModel from '../models/orderModel';
 import carts from "../models/cartModel";
 import usersModel from '../models/usersModel';
 import productsModel from "../models/productsModel";
-import { orderModel, CartModel, UserModel, BillProducts } from '../interfaces';
+import { OrderModel, CartModel, UserModel, BillProducts } from '../interfaces';
 
 // /api/orders/cartId
 export const createCashOrder = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
@@ -19,7 +19,7 @@ export const createCashOrder = expressAsyncHandler(async (req: express.Request, 
     const totalOrderPrice = cartPrice + shippingPrice;
 // create order with default payment cash
     const user: UserModel | null = await usersModel.findById(req.user!._id);
-    const order: orderModel | null = await ordersModel.create({
+    const order: OrderModel | null = await ordersModel.create({
         user: user,
         cartItems: cart.cartItems,
         totalOrderPrice,
@@ -41,3 +41,30 @@ await productsModel.bulkWrite(bulkOption ,{})
     res.status(200).json({ data: order, message: 'make order successfully' });
 })
 
+export const filterObjectForLoggedUser = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+if(req.user?.role == 'user'){
+req.filterData = {user:req.user?._id}
+}
+next();
+});
+export const getAllOrders = getAll<OrderModel>(ordersModel,'orders')
+export const getSecificOrder = getOne<OrderModel>(ordersModel,'orders','')
+
+export const updateOrederToPaid =expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+const order: OrderModel | null= await ordersModel.findById(req.params.id);
+if(!order){
+    return next(new ApiErrors(`there is no order with this id:${req.params.id} :`, 404));}
+    order.isPaid = true;
+    order.paidAt = Date.now();
+    const updatedOrder = await order.save();
+    res.status(200).json({status:'success',data:updatedOrder})
+});
+export const updateOrederToDelivered =expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+const order: OrderModel | null= await ordersModel.findById(req.params.id);
+if(!order){
+    return next(new ApiErrors(`there is no order with this id:${req.params.id} :`, 404));}
+    order.isDelivered = true;
+    order.deliveredAt = Date.now();
+    const updatedOrder = await order.save();
+    res.status(200).json({status:'success',data:updatedOrder})
+});

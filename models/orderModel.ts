@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
-import { orderModel } from "../interfaces";
+import { OrderModel } from "../interfaces";
 
-const orderSchema: mongoose.Schema = new mongoose.Schema<orderModel>({
+const orderSchema: mongoose.Schema = new mongoose.Schema<OrderModel>({
     user: {
         type: mongoose.Schema.Types.ObjectId,
         ref: "users",
@@ -40,4 +40,11 @@ const orderSchema: mongoose.Schema = new mongoose.Schema<orderModel>({
 
 }
     , { timestamps: true })
-export default mongoose.model<orderModel>("orders", orderSchema);
+
+    orderSchema.pre<OrderModel>(/^find/, function (next: mongoose.CallbackWithoutResultAndOptionalError): void {
+    this.populate({ path: 'cartItems.product', select: 'name sellingPrice images shop' });
+    this.populate({path : 'user',select:'name phone email address'});
+    next();
+});
+
+export default mongoose.model<OrderModel>("orders", orderSchema);
