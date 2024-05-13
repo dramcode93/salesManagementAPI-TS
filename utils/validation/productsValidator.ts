@@ -63,7 +63,7 @@ export const ProductImagesValidator = [
             if (!product) { deleteUploadedImages(images); return Promise.reject(new Error("Product not found")); };
             const imagesDifference: number = 5 - product.images.length;
             if (product.images.length >= 5) { deleteUploadedImages(images); return Promise.reject(new Error("every product has 5 images only, you can't add more")); };
-            if (product.images.length + images.length >= 5) { deleteUploadedImages(images); return Promise.reject(new Error(`every product has 5 images only, you can add only ${imagesDifference} more`)); };
+            if (product.images.length + images.length > 5) { deleteUploadedImages(images); return Promise.reject(new Error(`every product has 5 images only, you can add only ${imagesDifference} more`)); };
             return true;
         }),
     validatorMiddleware

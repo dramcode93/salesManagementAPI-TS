@@ -88,15 +88,23 @@ interface OrderModel extends mongoose.Document {
     totalOrderPrice: number;
     paymentMethodType: String;
     isPaid: Boolean;
-    paidAt: Date|number;
+    paidAt: Date | number;
     isDelivered: Boolean;
-    deliveredAt: Date|number;
+    deliveredAt: Date | number;
 };
 
 interface ShopModel extends mongoose.Document {
     name: string;
     type: ShopTypeModel[];
+    phone: string[];
     address: Address[];
+    allMoney: number;
+};
+interface FinancialTransactionsModel extends mongoose.Document {
+    money: number;
+    reason: string;
+    transaction: "withdraw" | "deposit";
+    shop: mongoose.Schema.Types.ObjectId;
 };
 
 interface ShopTypeModel extends mongoose.Document {
@@ -179,4 +187,4 @@ declare module 'express' {
     }
 };
 
-export { CategoryModel, CouponModel, CartModel, ProductModel, UserModel, CustomerModel, BillModel, BillProducts, OrderModel, ShopModel, ShopTypeModel, GovernorateModel, Address, CityModel, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery, EmailOptions, SendEmailOptions };
+export { CategoryModel, CouponModel, CartModel, ProductModel, UserModel, CustomerModel, BillModel, BillProducts, OrderModel, ShopModel, ShopTypeModel, FinancialTransactionsModel, GovernorateModel, Address, CityModel, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery, EmailOptions, SendEmailOptions };
