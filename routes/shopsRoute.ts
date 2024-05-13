@@ -1,23 +1,23 @@
 import { Router } from "express";
 import { allowedTo, checkActive, protectRoutes } from "../controllers/auth";
-import { addShopAddress, addShopType, checkCreateShop, checkShops, createShop, deleteShopAddress, deleteShopType, getShop, getShops, getShopsList, updateShop } from "../controllers/shops";
-import { createShopValidator, getShopValidator, shopAddressValidator, shopTypeValidator, updateShopValidator } from "../utils/validation/shopsValidator";
+import { addShopAddress, addShopPhone, addShopType, checkCreateShop, checkShops, createShop, deleteShopAddress, deleteShopPhone, deleteShopType, getShop, getShops, updateShop } from "../controllers/shops";
+import { createShopValidator, getShopValidator, shopAddressValidator, shopPhoneValidator, shopTypeValidator, updateShopValidator } from "../utils/validation/shopsValidator";
 import productsRoute from "./productsRoute";
 
 const shopsRoute: Router = Router();
 
-shopsRoute.use('/:shopId/products',allowedTo('customers'), productsRoute);
+shopsRoute.use('/:shopId/products', allowedTo('customers'), productsRoute);
 shopsRoute.use(protectRoutes, checkActive);
 
 shopsRoute.route('/')
     .get(getShops)
     .post(allowedTo('admin'), checkCreateShop, createShopValidator, createShop);
 
-// shopsRoute.get('/list', getShopsList);
+shopsRoute.use(checkShops);
 
 shopsRoute.route("/:id")
-    .get(getShopValidator, getShop)
-    .put(allowedTo('admin'), checkShops, updateShopValidator, updateShop);
+    .get(allowedTo('admin', 'user'), getShopValidator, getShop)
+    .put(allowedTo('admin'), updateShopValidator, updateShop);
 
 shopsRoute.use(allowedTo('admin'));
 
@@ -28,5 +28,9 @@ shopsRoute.route("/:id/type")
 shopsRoute.route("/:id/address")
     .put(shopAddressValidator, addShopAddress)
     .delete(shopAddressValidator, deleteShopAddress);
+
+shopsRoute.route("/:id/phone")
+    .put(shopPhoneValidator, addShopPhone)
+    .delete(shopPhoneValidator, deleteShopPhone);
 
 export default shopsRoute;

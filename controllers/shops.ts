@@ -3,28 +3,24 @@ import expressAsyncHandler from "express-async-handler";
 import shopsModel from "../models/shopsModel";
 import usersModel from "../models/usersModel";
 import ApiErrors from "../utils/errors";
-import { ShopModel, FilterData, UserModel } from "../interfaces";
-import { deleteOne, getAll, getAllList, getOne, updateOne } from "./refactorHandler";
-import { sanitizeUser } from "../utils/sanitization";
+import { ShopModel } from "../interfaces";
+import { deleteOne, getAll, getOne } from "./refactorHandler";
 
 const getShops = getAll<ShopModel>(shopsModel, 'shops');
-const getShopsList = getAllList<ShopModel>(shopsModel, '');
 const getShop = getOne<ShopModel>(shopsModel, 'shops', '');
-const updateShop = updateOne<ShopModel>(shopsModel);
 const DeleteShop = deleteOne<ShopModel>(shopsModel);
 
 const createShop = expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
     const shop: ShopModel = await shopsModel.create(req.body);
-    const user: UserModel | null = await usersModel.findByIdAndUpdate(req.user?._id, { shop: shop._id }, { new: true });
-    res.status(201).json({ data: shop, user: sanitizeUser(user) });
+    await usersModel.findByIdAndUpdate(req.user?._id, { shop: shop._id }, { new: true });
+    res.status(201).json({ data: shop });
 });
 
-const filterShops = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
-    let filterData: FilterData = {};
-    filterData.shop = req.user?.shop;
-    req.filterData = filterData;
-    next();
-};
+const updateShop = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+    const shop: ShopModel | null = await shopsModel.findByIdAndUpdate(req.params.id, { name: req.body.name }, { new: true });
+    if (!shop) { return next(new ApiErrors(`No shop for this id`, 404)); };
+    res.status(201).json({ data: shop });
+});
 
 const checkShops = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
     if (req.user?.role !== "customer") { if (!req.user?.shop) { return next(new ApiErrors("you can't do this action without shop", 400)); }; };
@@ -50,6 +46,13 @@ const addShopAddress = expressAsyncHandler(async (req: express.Request, res: exp
     res.status(200).json({ message: 'shop address added successfully' });
 });
 
+const addShopPhone = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+    const shop: ShopModel | null = await shopsModel.findById(req.params.id);
+    if (!shop) { return next(new ApiErrors('no shop for this Id', 404)); };
+    await shopsModel.findByIdAndUpdate(shop._id, { $addToSet: { phone: req.body.phone } }, { new: true });
+    res.status(200).json({ message: 'shop phone added successfully' });
+});
+
 const deleteShopType = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     const shop: ShopModel | null = await shopsModel.findById(req.params.id);
     if (!shop) { return next(new ApiErrors('no shop for this Id', 404)); };
@@ -64,4 +67,11 @@ const deleteShopAddress = expressAsyncHandler(async (req: express.Request, res: 
     res.status(200).json({ message: 'shop address deleted successfully' });
 });
 
-export { getShops, getShopsList, createShop, getShop, updateShop, DeleteShop, checkShops, checkCreateShop, addShopType, addShopAddress, deleteShopType, deleteShopAddress };
+const deleteShopPhone = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+    const shop: ShopModel | null = await shopsModel.findById(req.params.id);
+    if (!shop) { return next(new ApiErrors('no shop for this Id', 404)); };
+    await shopsModel.findByIdAndUpdate(shop._id, { $pull: { phone: req.body.phone } }, { new: true });
+    res.status(200).json({ message: 'shop phone deleted successfully' });
+});
+
+export { getShops, createShop, getShop, updateShop, DeleteShop, checkShops, checkCreateShop, addShopType, addShopAddress, addShopPhone, deleteShopType, deleteShopAddress, deleteShopPhone };
