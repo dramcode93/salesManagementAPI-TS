@@ -6,7 +6,7 @@ import productsRoute from "./productsRoute";
 
 const shopsRoute: Router = Router();
 
-shopsRoute.use('/:shopId/products', allowedTo('customers'), productsRoute);
+shopsRoute.use('/:shopId/products', productsRoute);
 shopsRoute.use(protectRoutes, checkActive);
 
 shopsRoute.route('/')
