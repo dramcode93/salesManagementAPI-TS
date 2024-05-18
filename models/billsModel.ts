@@ -1,5 +1,8 @@
 import mongoose from "mongoose";
-import { BillModel } from "../interfaces";
+import dailySalesModel from "./dailySalesModel";
+import monthlySalesModel from "./monthlySalesModel";
+import yearlySalesModel from "./yearlySalesModel";
+import { BillModel, SalesModel } from "../interfaces";
 
 const billSchema: mongoose.Schema = new mongoose.Schema<BillModel>({
     customer: {
@@ -28,18 +31,51 @@ const billSchema: mongoose.Schema = new mongoose.Schema<BillModel>({
 }, { timestamps: true });
 
 billSchema.pre<BillModel>('save', async function (next: mongoose.CallbackWithoutResultAndOptionalError): Promise<void> {
-    await this.populate({ path: 'products.product', select: 'sellingPrice' });
+    const date: Date = new Date();
+    await this.populate({ path: 'products.product', select: 'sellingPrice productPrice' });
     const products = this.products;
-    let total: number = 0;
+    let totalSellingPrice: number = 0;
+    let totalProductPrice: number = 0;
     for (const item of products) {
         const totalPrice: number = item.product.sellingPrice * item.productQuantity;
+        const productPrice: number = item.product.productPrice * item.productQuantity;
         item.totalPrice = totalPrice;
-        total += totalPrice;
+        totalSellingPrice += totalPrice;
+        totalProductPrice += productPrice;
     };
-    this.totalAmountBeforeDiscount = total;
+    this.totalAmountBeforeDiscount = totalSellingPrice;
     if (this.discount !== 0) { this.totalAmountAfterDiscount = this.totalAmountBeforeDiscount - (this.discount / 100) * this.totalAmountBeforeDiscount; }
     else { this.totalAmountAfterDiscount = this.totalAmountBeforeDiscount; };
     this.remainingAmount = this.totalAmountAfterDiscount - this.paidAmount;
+
+    // * daily sales
+    const startOfDay: Date = new Date(date.setHours(0, 0, 0, 0));
+    const endOfDay: Date = new Date(date.setHours(23, 59, 59, 999));
+    const dailySales: SalesModel | null = await dailySalesModel.findOne({ shop: this.shop, createdAt: { $gte: startOfDay, $lt: endOfDay } });
+    if (!dailySales) { await dailySalesModel.create({ sales: this.totalAmountAfterDiscount, earnings: this.totalAmountAfterDiscount - totalProductPrice, shop: this.shop }); }
+    else {
+        dailySales.sales += this.totalAmountAfterDiscount;
+        dailySales.earnings += (this.totalAmountAfterDiscount - totalProductPrice);
+        dailySales.save();
+    };
+
+    // * monthly sales
+    const monthlySales: SalesModel | null = await monthlySalesModel.findOne({ shop: this.shop, $expr: { $and: [{ $eq: [{ $year: "$createdAt" }, date.getFullYear()] }, { $eq: [{ $month: "$createdAt" }, date.getMonth() + 1] }] } });
+    if (!monthlySales) { await monthlySalesModel.create({ sales: this.totalAmountAfterDiscount, earnings: this.totalAmountAfterDiscount - totalProductPrice, shop: this.shop }); }
+    else {
+        monthlySales.sales += this.totalAmountAfterDiscount;
+        monthlySales.earnings += (this.totalAmountAfterDiscount - totalProductPrice);
+        monthlySales.save();
+    };
+
+    // * yearly sales
+    const yearlySales: SalesModel | null = await yearlySalesModel.findOne({ shop: this.shop, $expr: { $eq: [{ $year: "$createdAt" }, date.getFullYear()] } });
+    if (!yearlySales) { await yearlySalesModel.create({ sales: this.totalAmountAfterDiscount, earnings: this.totalAmountAfterDiscount - totalProductPrice, shop: this.shop }); }
+    else {
+        yearlySales.sales += this.totalAmountAfterDiscount;
+        yearlySales.earnings += (this.totalAmountAfterDiscount - totalProductPrice);
+        yearlySales.save();
+    };
     next();
 });
 

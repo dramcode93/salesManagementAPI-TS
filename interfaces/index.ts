@@ -107,6 +107,13 @@ interface FinancialTransactionsModel extends mongoose.Document {
     shop: mongoose.Schema.Types.ObjectId;
 };
 
+interface SalesModel extends mongoose.Document {
+    sales: number;
+    earnings: number;
+    createdAt: Date;
+    shop: mongoose.Schema.Types.ObjectId;
+};
+
 interface ShopTypeModel extends mongoose.Document {
     type_ar: string;
     type_en: string;
@@ -187,4 +194,4 @@ declare module 'express' {
     }
 };
 
-export { CategoryModel, CouponModel, CartModel, ProductModel, UserModel, CustomerModel, BillModel, BillProducts, OrderModel, ShopModel, ShopTypeModel, FinancialTransactionsModel, GovernorateModel, Address, CityModel, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery, EmailOptions, SendEmailOptions };
+export { CategoryModel, CouponModel, CartModel, ProductModel, UserModel, CustomerModel, BillModel, BillProducts, OrderModel, ShopModel, ShopTypeModel, FinancialTransactionsModel, SalesModel, GovernorateModel, Address, CityModel, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery, EmailOptions, SendEmailOptions };

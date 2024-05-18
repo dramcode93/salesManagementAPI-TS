@@ -3,7 +3,7 @@ import expressAsyncHandler from "express-async-handler";
 import financialTransactionsModel from "../models/financialTransactionsModel";
 import shopsModel from "../models/shopsModel";
 import ApiErrors from "../utils/errors";
-import { ShopModel, FinancialTransactionsModel } from "../interfaces";
+import { ShopModel, FinancialTransactionsModel, FilterData } from "../interfaces";
 import { getAll, getOne } from "./refactorHandler";
 
 const getFinancialTransactions = getAll<FinancialTransactionsModel>(financialTransactionsModel, 'financialTransactions');
@@ -23,4 +23,11 @@ const createFinancialTransactions = expressAsyncHandler(async (req: express.Requ
     res.status(200).json({ data: financialTransaction });
 });
 
-export { getFinancialTransactions, getFinancialTransaction, createFinancialTransactions };
+const filterFinancialTransactions = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
+    let filterData: FilterData = {};
+    filterData.shop = req.user?.shop;
+    req.filterData = filterData;
+    next();
+};
+
+export { getFinancialTransactions, getFinancialTransaction, createFinancialTransactions,filterFinancialTransactions };

@@ -7,11 +7,12 @@ import productsRoute from "./productsRoute";
 const shopsRoute: Router = Router();
 
 shopsRoute.use('/:shopId/products', productsRoute);
+
+shopsRoute.route('/').get(getShops);
+
 shopsRoute.use(protectRoutes, checkActive);
 
-shopsRoute.route('/')
-    .get(getShops)
-    .post(allowedTo('admin'), checkCreateShop, createShopValidator, createShop);
+shopsRoute.route('/').post(allowedTo('admin'), checkCreateShop, createShopValidator, createShop);
 
 shopsRoute.use(checkShops);
 
