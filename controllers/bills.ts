@@ -25,11 +25,9 @@ const createBill = expressAsyncHandler(async (req: express.Request, res: express
     products.map(async (productData: BillProducts): Promise<void> => { await productsModel.findByIdAndUpdate(productData.product, { $inc: { quantity: -productData.productQuantity, sold: productData.productQuantity } }); });
     req.body.user = req.user?._id;
     req.body.shop = req.user?.shop;
-    const bill: BillModel = await billsModel.create(req.body);
+    let bill: BillModel | null = await billsModel.create(req.body);
     const customer: CustomerModel | null = await customersModel.findById(bill.customer);
-    bill.customerName = customer!.name;
-    bill.code = bill._id.toString();
-    await bill.save();
+    bill = await billsModel.findByIdAndUpdate(bill._id, { customerName: customer?.name, code: bill._id.toString() }, { new: true })
     res.status(200).json({ data: bill });
 });
 
