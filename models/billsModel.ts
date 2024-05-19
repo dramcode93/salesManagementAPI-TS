@@ -3,6 +3,7 @@ import dailySalesModel from "./dailySalesModel";
 import monthlySalesModel from "./monthlySalesModel";
 import yearlySalesModel from "./yearlySalesModel";
 import { BillModel, SalesModel } from "../interfaces";
+import shopsModel from "./shopsModel";
 
 const billSchema: mongoose.Schema = new mongoose.Schema<BillModel>({
     customer: {
@@ -76,6 +77,9 @@ billSchema.pre<BillModel>('save', async function (next: mongoose.CallbackWithout
         yearlySales.earnings += (this.totalAmountAfterDiscount - totalProductPrice);
         yearlySales.save();
     };
+
+    // * shop money
+    await shopsModel.findByIdAndUpdate(this.shop, { $inc: { allMoney: this.totalAmountAfterDiscount } }, { new: true });
     next();
 });
 

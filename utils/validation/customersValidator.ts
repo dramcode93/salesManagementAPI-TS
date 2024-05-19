@@ -37,7 +37,13 @@ export const getCustomerValidator = [
 export const updateCustomerValidator = [
     check("id").isMongoId().withMessage("Invalid customer Id"),
     check('name').optional().isLength({ min: 2, max: 50 }).withMessage("Name length must be between 2 and 50"),
-    check('address').optional()
+    check("phone").optional().isMobilePhone("ar-EG").withMessage("InValid Phone Number only accept EG Number "),
+    validatorMiddleware,
+];
+
+export const customerAddressValidator = [
+    check('id').isMongoId().withMessage("invalid customer id"),
+    check('address').notEmpty().withMessage('Invalid address')
         .custom(async (address: Address): Promise<boolean> => {
             const governorate: GovernorateModel | null = await governoratesModel.findById(address.governorate);
             if (!governorate) { return Promise.reject(new Error('governorate not found')); };
@@ -54,8 +60,13 @@ export const updateCustomerValidator = [
             // }));
             return true;
         }),
-    check("phone").optional().isMobilePhone("ar-EG").withMessage("InValid Phone Number only accept EG Number "),
-    validatorMiddleware,
+    validatorMiddleware
+];
+
+export const customerPhoneValidator = [
+    check('id').isMongoId().withMessage("invalid customer id"),
+    check('phone').notEmpty().withMessage("phone number can't be empty").isMobilePhone('ar-EG').withMessage('Invalid phone number'),
+    validatorMiddleware
 ];
 
 export const deleteCustomerValidator = [
