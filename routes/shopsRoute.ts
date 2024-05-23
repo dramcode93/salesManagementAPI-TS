@@ -9,30 +9,28 @@ const shopsRoute: Router = Router();
 shopsRoute.use('/:shopId/products', productsRoute);
 
 shopsRoute.route('/').get(getShops);
+// ! shopsRoute.route("/:id").get(getShopValidator, getShop);
 
 shopsRoute.use(protectRoutes, checkActive);
 
 shopsRoute.route('/').post(allowedTo('admin'), checkCreateShop, createShopValidator, createShop);
 
 
-shopsRoute.use(checkShops);
+shopsRoute.use(checkShops, allowedTo('admin'));
 
-shopsRoute.route('/myShop').get(allowedTo('admin'), getMyShop);
-shopsRoute.route("/:id")
-    .get(allowedTo('admin', 'user'), getShopValidator, getShop)
-    .put(allowedTo('admin'), updateShopValidator, updateShop);
+shopsRoute.route('/myShop')
+    .get(getMyShop)
+    .put(updateShopValidator, updateShop);
 
-shopsRoute.use(allowedTo('admin'));
-
-shopsRoute.route("/:id/type")
+shopsRoute.route("/myShop/type")
     .put(shopTypeValidator, addShopType)
     .delete(shopTypeValidator, deleteShopType);
 
-shopsRoute.route("/:id/address")
+shopsRoute.route("/myShop/address")
     .put(shopAddressValidator, addShopAddress)
     .delete(shopAddressValidator, deleteShopAddress);
 
-shopsRoute.route("/:id/phone")
+shopsRoute.route("/myShop/phone")
     .put(shopPhoneValidator, addShopPhone)
     .delete(shopPhoneValidator, deleteShopPhone);
 

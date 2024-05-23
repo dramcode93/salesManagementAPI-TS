@@ -23,7 +23,7 @@ const getMyShop = expressAsyncHandler(async (req: express.Request, res: express.
 });
 
 const updateShop = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
-    const shop: ShopModel | null = await shopsModel.findByIdAndUpdate(req.params.id, { name: req.body.name }, { new: true });
+    const shop: ShopModel | null = await shopsModel.findByIdAndUpdate(req.user?.shop, { name: req.body.name }, { new: true });
     if (!shop) { return next(new ApiErrors(`No shop for this id`, 404)); };
     res.status(201).json({ data: shop });
 });
@@ -39,42 +39,42 @@ const checkCreateShop = (req: express.Request, res: express.Response, next: expr
 };
 
 const addShopType = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
-    const shop: ShopModel | null = await shopsModel.findById(req.params.id);
+    const shop: ShopModel | null = await shopsModel.findById(req.user?.shop);
     if (!shop) { return next(new ApiErrors('no shop for this Id', 404)); };
     await shopsModel.findByIdAndUpdate(shop._id, { $addToSet: { type: req.body.type } }, { new: true });
     res.status(200).json({ message: 'shop type added successfully' });
 });
 
 const addShopAddress = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
-    const shop: ShopModel | null = await shopsModel.findById(req.params.id);
+    const shop: ShopModel | null = await shopsModel.findById(req.user?.shop);
     if (!shop) { return next(new ApiErrors('no shop for this Id', 404)); };
     await shopsModel.findByIdAndUpdate(shop._id, { $addToSet: { address: req.body.address } }, { new: true });
     res.status(200).json({ message: 'shop address added successfully' });
 });
 
 const addShopPhone = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
-    const shop: ShopModel | null = await shopsModel.findById(req.params.id);
+    const shop: ShopModel | null = await shopsModel.findById(req.user?.shop);
     if (!shop) { return next(new ApiErrors('no shop for this Id', 404)); };
     await shopsModel.findByIdAndUpdate(shop._id, { $addToSet: { phone: req.body.phone } }, { new: true });
     res.status(200).json({ message: 'shop phone added successfully' });
 });
 
 const deleteShopType = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
-    const shop: ShopModel | null = await shopsModel.findById(req.params.id);
+    const shop: ShopModel | null = await shopsModel.findById(req.user?.shop);
     if (!shop) { return next(new ApiErrors('no shop for this Id', 404)); };
     await shopsModel.findByIdAndUpdate(shop._id, { $pull: { type: req.body.type } }, { new: true });
     res.status(200).json({ message: 'shop type deleted successfully' });
 });
 
 const deleteShopAddress = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
-    const shop: ShopModel | null = await shopsModel.findById(req.params.id);
+    const shop: ShopModel | null = await shopsModel.findById(req.user?.shop);
     if (!shop) { return next(new ApiErrors('no shop for this Id', 404)); };
     await shopsModel.findByIdAndUpdate(shop._id, { $pull: { address: req.body.address } }, { new: true });
     res.status(200).json({ message: 'shop address deleted successfully' });
 });
 
 const deleteShopPhone = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
-    const shop: ShopModel | null = await shopsModel.findById(req.params.id);
+    const shop: ShopModel | null = await shopsModel.findById(req.user?.shop);
     if (!shop) { return next(new ApiErrors('no shop for this Id', 404)); };
     await shopsModel.findByIdAndUpdate(shop._id, { $pull: { phone: req.body.phone } }, { new: true });
     res.status(200).json({ message: 'shop phone deleted successfully' });
