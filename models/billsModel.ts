@@ -79,7 +79,7 @@ billSchema.pre<BillModel>('save', async function (next: mongoose.CallbackWithout
     };
 
     // * shop money
-    await shopsModel.findByIdAndUpdate(this.shop, { $inc: { allMoney: this.totalAmountAfterDiscount } }, { new: true });
+    await shopsModel.findByIdAndUpdate(this.shop, { $inc: { allMoney: this.totalAmountAfterDiscount, productsMoney: -totalProductPrice } }, { new: true });
     next();
 });
 

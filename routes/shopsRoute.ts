@@ -1,6 +1,6 @@
 import { Router } from "express";
 import { allowedTo, checkActive, protectRoutes } from "../controllers/auth";
-import { addShopAddress, addShopPhone, addShopType, checkCreateShop, checkShops, createShop, deleteShopAddress, deleteShopPhone, deleteShopType, getShop, getShops, updateShop } from "../controllers/shops";
+import { addShopAddress, addShopPhone, addShopType, checkCreateShop, checkShops, createShop, deleteShopAddress, deleteShopPhone, deleteShopType, getMyShop, getShop, getShops, updateShop } from "../controllers/shops";
 import { createShopValidator, getShopValidator, shopAddressValidator, shopPhoneValidator, shopTypeValidator, updateShopValidator } from "../utils/validation/shopsValidator";
 import productsRoute from "./productsRoute";
 
@@ -14,8 +14,10 @@ shopsRoute.use(protectRoutes, checkActive);
 
 shopsRoute.route('/').post(allowedTo('admin'), checkCreateShop, createShopValidator, createShop);
 
+
 shopsRoute.use(checkShops);
 
+shopsRoute.route('/myShop').get(allowedTo('admin'), getMyShop);
 shopsRoute.route("/:id")
     .get(allowedTo('admin', 'user'), getShopValidator, getShop)
     .put(allowedTo('admin'), updateShopValidator, updateShop);

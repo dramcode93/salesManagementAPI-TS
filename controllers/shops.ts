@@ -16,6 +16,12 @@ const createShop = expressAsyncHandler(async (req: express.Request, res: express
     res.status(201).json({ data: shop });
 });
 
+const getMyShop = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+    const shop: ShopModel | null = await shopsModel.findById(req.user?.shop);
+    if (!shop) { return next(new ApiErrors(`No shop for this id`, 404)); };
+    res.status(201).json({ data: shop });
+});
+
 const updateShop = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     const shop: ShopModel | null = await shopsModel.findByIdAndUpdate(req.params.id, { name: req.body.name }, { new: true });
     if (!shop) { return next(new ApiErrors(`No shop for this id`, 404)); };
@@ -74,4 +80,4 @@ const deleteShopPhone = expressAsyncHandler(async (req: express.Request, res: ex
     res.status(200).json({ message: 'shop phone deleted successfully' });
 });
 
-export { getShops, createShop, getShop, updateShop, DeleteShop, checkShops, checkCreateShop, addShopType, addShopAddress, addShopPhone, deleteShopType, deleteShopAddress, deleteShopPhone };
+export { getShops, createShop, getShop, getMyShop, updateShop, DeleteShop, checkShops, checkCreateShop, addShopType, addShopAddress, addShopPhone, deleteShopType, deleteShopAddress, deleteShopPhone };

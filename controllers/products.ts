@@ -3,17 +3,24 @@ import expressAsyncHandler from 'express-async-handler';
 import sharp from 'sharp';
 import ApiErrors from '../utils/errors';
 import productsModel from "../models/productsModel";
+import shopsModel from '../models/shopsModel';
 import { FilterData, ProductModel } from "../interfaces";
 import { uploadMultiImages } from '../middlewares/uploadFiles';
 import { deleteUploadedImages } from '../utils/validation/productsValidator';
-import { createOne, deleteOne, getAll, getAllList, getOne, updateOne } from "./refactorHandler";
+import { deleteOne, getAll, getAllList, getOne, updateOne } from "./refactorHandler";
 
 const getProducts = getAll<ProductModel>(productsModel, 'products');
 const getProductsList = getAllList<ProductModel>(productsModel, '');
-const createProduct = createOne<ProductModel>(productsModel);
 const getProduct = getOne<ProductModel>(productsModel, 'products', '');
 const updateProduct = updateOne<ProductModel>(productsModel);
 const DeleteProduct = deleteOne<ProductModel>(productsModel);
+
+const createProduct = expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
+    req.body.shop = req.user?.shop;
+    const product: ProductModel = await productsModel.create(req.body);
+    await shopsModel.findByIdAndUpdate(product.shop, { $inc: { productsMoney: product.quantity * product.productPrice } }, { new: true })
+    res.status(200).json({ data: product });
+});
 
 const addProductCategory = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
     if (!req.body.category) { req.body.category = req.params.categoryId }; next();
