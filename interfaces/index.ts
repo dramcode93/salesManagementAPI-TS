@@ -99,6 +99,7 @@ interface ShopModel extends mongoose.Document {
     phone: string[];
     address: Address[];
     allMoney: number;
+    productsMoney: number;
 };
 interface FinancialTransactionsModel extends mongoose.Document {
     money: number;

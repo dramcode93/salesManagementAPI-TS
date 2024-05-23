@@ -19,7 +19,8 @@ const shopSchema: mongoose.Schema = new mongoose.Schema<ShopModel>({
         city: { type: mongoose.Schema.Types.ObjectId, ref: "cities" },
         street: { type: String }
     }],
-    allMoney: { type: Number, default: 0 }
+    allMoney: { type: Number, default: 0 },
+    productsMoney: { type: Number, default: 0 }
 }, { timestamps: true });
 
 shopSchema.pre<ShopModel>(/^find/, function (next: mongoose.CallbackWithoutResultAndOptionalError): void {
