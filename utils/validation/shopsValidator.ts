@@ -17,6 +17,7 @@ export const createShopValidator = [
             if (!shopType) { return Promise.reject(new Error('shop type does not exist')); };
             return true;
         }),
+    check('phone').notEmpty().withMessage("phone number can't be empty").isMobilePhone('ar-EG').withMessage('Invalid phone number'),
     check('address').notEmpty().withMessage("shop address is required")
         .custom(async (address: Address): Promise<boolean> => {
             const governorate: GovernorateModel | null = await governoratesModel.findById(address.governorate);
@@ -43,7 +44,6 @@ export const getShopValidator = [
 ];
 
 export const updateShopValidator = [
-    check('id').isMongoId().withMessage("invalid shop id"),
     check('name').optional().isLength({ min: 2, max: 50 }).withMessage("name length must be between 2 and 50"),
     validatorMiddleware
 ];
@@ -54,7 +54,6 @@ export const deleteShopValidator = [
 ];
 
 export const shopAddressValidator = [
-    check('id').isMongoId().withMessage("invalid shop id"),
     check('address').notEmpty().withMessage('Invalid address')
         .custom(async (address: Address): Promise<boolean> => {
             const governorate: GovernorateModel | null = await governoratesModel.findById(address.governorate);
@@ -76,7 +75,6 @@ export const shopAddressValidator = [
 ];
 
 export const shopTypeValidator = [
-    check('id').isMongoId().withMessage("invalid shop id"),
     check('type')
         .notEmpty().withMessage('shop type is required')
         .isMongoId().withMessage('Invalid shop type id')
@@ -89,7 +87,6 @@ export const shopTypeValidator = [
 ];
 
 export const shopPhoneValidator = [
-    check('id').isMongoId().withMessage("invalid shop id"),
     check('phone').notEmpty().withMessage("phone number can't be empty").isMobilePhone('ar-EG').withMessage('Invalid phone number'),
     validatorMiddleware
 ];

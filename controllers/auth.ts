@@ -85,7 +85,7 @@ const protectRoutes = expressAsyncHandler(async (req: express.Request, res: expr
             return next(new ApiErrors('Failed to refresh token.', 500));
         };
     };
-    const user: UserModel | null = await usersModel.findById(decoded._id); // * Check if user exist
+    const user: any = sanitizeUser(await usersModel.findById(decoded._id)); // * Check if user exist
     if (!user) { return next(new ApiErrors('The user does not exist anymore...', 404)); };
     if (user.passwordChangedAt instanceof Date) { // * Check if user change his password
         const changedPasswordTime: number = (user.passwordChangedAt.getTime() / 1000);
