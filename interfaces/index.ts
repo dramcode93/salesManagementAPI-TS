@@ -83,10 +83,11 @@ interface BillProducts {
 };
 interface OrderModel extends mongoose.Document {
     user: mongoose.Schema.Types.ObjectId;
+    shop: mongoose.Schema.Types.ObjectId;
     cartItems: BillProducts[];
-    shippingPrice: number;
     totalOrderPrice: number;
-    paymentMethodType: String;
+    paymentMethodType: 'cash' | 'online';
+    receivingMethod: 'delivery' | 'shop';
     isPaid: Boolean;
     paidAt: Date | number;
     isDelivered: Boolean;
@@ -100,6 +101,9 @@ interface ShopModel extends mongoose.Document {
     address: Address[];
     allMoney: number;
     productsMoney: number;
+    shippingPrice: number;
+    deliveryService: boolean;
+    onlinePaymentMethods: string[];
 };
 interface FinancialTransactionsModel extends mongoose.Document {
     money: number;

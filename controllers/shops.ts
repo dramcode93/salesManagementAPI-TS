@@ -23,7 +23,7 @@ const getMyShop = expressAsyncHandler(async (req: express.Request, res: express.
 });
 
 const updateShop = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
-    const shop: ShopModel | null = await shopsModel.findByIdAndUpdate(req.user?.shop, { name: req.body.name }, { new: true });
+    const shop: ShopModel | null = await shopsModel.findByIdAndUpdate(req.user?.shop, { name: req.body.name, shippingPrice: req.body.shippingPrice, deliveryService: req.body.deliveryService }, { new: true });
     if (!shop) { return next(new ApiErrors(`No shop for this id`, 404)); };
     res.status(201).json({ data: shop });
 });
