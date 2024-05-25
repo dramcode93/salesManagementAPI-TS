@@ -7,6 +7,11 @@ const orderSchema: mongoose.Schema = new mongoose.Schema<OrderModel>({
         ref: "users",
         required: [true, "order must be belong to user"]
     },
+    shop: {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "shops",
+        required: [true, "order must be belong to shop"]
+    },
     cartItems: [{
         product: {
             type: mongoose.Schema.ObjectId,
@@ -15,17 +20,18 @@ const orderSchema: mongoose.Schema = new mongoose.Schema<OrderModel>({
         productQuantity: Number,
         totalPrice: { type: Number },
     }],
-    shippingPrice: {
-        type: Number,
-        default: 0
-    },
     totalOrderPrice: {
         type: Number
     },
     paymentMethodType: {
         type: String,
-        enum: ["cash", "vodafone cash"],
+        enum: ["cash", "online"],
         default: "cash"
+    },
+    receivingMethod: {
+        type: String,
+        enum: ["delivery", "shop"],
+        default: "delivery"
     },
     isPaid: {
         type: Boolean,
@@ -41,9 +47,9 @@ const orderSchema: mongoose.Schema = new mongoose.Schema<OrderModel>({
 }
     , { timestamps: true })
 
-    orderSchema.pre<OrderModel>(/^find/, function (next: mongoose.CallbackWithoutResultAndOptionalError): void {
+orderSchema.pre<OrderModel>(/^find/, function (next: mongoose.CallbackWithoutResultAndOptionalError): void {
     this.populate({ path: 'cartItems.product', select: 'name sellingPrice images shop' });
-    this.populate({path : 'user',select:'name phone email address'});
+    this.populate({ path: 'user', select: 'name phone email address' });
     next();
 });
 

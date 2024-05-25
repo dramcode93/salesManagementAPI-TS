@@ -1,14 +1,16 @@
 import { Router } from "express";
 import { allowedTo, checkActive, protectRoutes } from "../controllers/auth";
-import { createCashOrder,getAllOrders,getSecificOrder,filterObjectForLoggedUser,updateOrederToPaid,updateOrederToDelivered } from "../controllers/order"
+import { checkShops } from "../controllers/shops";
+import { createCashOrder, getAllOrders, getSpecificOrder, filterOrders, updateOrderToPaid, updateOrderToDelivered } from "../controllers/order"
+import { getOrderValidator } from "../utils/validation/ordersValidator";
 const orderRoute = Router();
-orderRoute.use(protectRoutes, checkActive);
+orderRoute.use(protectRoutes, checkActive, checkShops);
 
-orderRoute.route("/:id").post(allowedTo('customer'),createCashOrder)
-    orderRoute.route("/").get(allowedTo('customer','user','admin'),filterObjectForLoggedUser,getAllOrders)
-    orderRoute.route("/:id").get(getSecificOrder)
-    orderRoute.route("/:id/pay").put(allowedTo('user','admin'),updateOrederToPaid)
-    orderRoute.route("/:id/deliver").put(allowedTo('user','admin'),updateOrederToDelivered)
-
+orderRoute.route("/")
+    .get(allowedTo('customer', 'user', 'admin'), filterOrders, getAllOrders)
+    .post(allowedTo('customer'), createCashOrder);
+orderRoute.route("/:id").get(allowedTo('customer', 'user', 'admin'), getOrderValidator, getSpecificOrder)
+orderRoute.route("/:id/pay").put(allowedTo('user', 'admin'), getOrderValidator, updateOrderToPaid)
+orderRoute.route("/:id/deliver").put(allowedTo('user', 'admin'), getOrderValidator, updateOrderToDelivered)
 
 export default orderRoute;

@@ -13,14 +13,17 @@ const shopSchema: mongoose.Schema = new mongoose.Schema<ShopModel>({
         type: mongoose.Schema.Types.ObjectId,
         ref: "shopTypes"
     }],
-    phone: [{ type: String, }],
+    phone: [{ type: String }],
     address: [{
         governorate: { type: mongoose.Schema.Types.ObjectId, ref: "governorates" },
         city: { type: mongoose.Schema.Types.ObjectId, ref: "cities" },
         street: { type: String }
     }],
     allMoney: { type: Number, default: 0 },
-    productsMoney: { type: Number, default: 0 }
+    productsMoney: { type: Number, default: 0 },
+    shippingPrice: { type: Number, default: 0 },
+    deliveryService: { type: Boolean },
+    onlinePaymentMethods: [{ type: String }]
 }, { timestamps: true });
 
 shopSchema.pre<ShopModel>(/^find/, function (next: mongoose.CallbackWithoutResultAndOptionalError): void {
