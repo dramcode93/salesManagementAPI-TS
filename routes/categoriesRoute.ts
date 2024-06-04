@@ -22,6 +22,6 @@ categoriesRoute.use(allowedTo('admin'))
 categoriesRoute.route("/:id")
     .get(classValidatorMiddleware(GetCategoryDto), getCategory)
     .put(classValidatorMiddleware(UpdateCategoryDto), updateCategory)
-    .delete(deleteCategoryValidator, DeleteCategory);
+    .delete(classValidatorMiddleware(DeleteCategoryDto), DeleteCategory);
 
 export default categoriesRoute;
