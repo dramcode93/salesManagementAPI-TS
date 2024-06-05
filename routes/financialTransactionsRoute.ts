@@ -12,8 +12,8 @@ financialTransactionsRoute.use(protectRoutes, checkActive, allowedTo('admin'), c
 
 financialTransactionsRoute.route('/')
     .get(filterFinancialTransactions, getFinancialTransactions)
-    .post(classValidatorMiddleware(CreateFinancialTransactionDto), createFinancialTransactions);
+    .post(createFinancialTransactionValidator, createFinancialTransactions);
 
-financialTransactionsRoute.route("/:id").get(classValidatorMiddleware(GetFinancialTransactionDto), getFinancialTransaction);
+financialTransactionsRoute.route("/:id").get(getFinancialTransactionValidator, getFinancialTransaction);
 
 export default financialTransactionsRoute;

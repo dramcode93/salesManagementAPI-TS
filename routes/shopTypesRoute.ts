@@ -11,13 +11,13 @@ shopTypesRoute.use(protectRoutes, checkActive);
 
 shopTypesRoute.route('/')
     .get(getShopTypes)
-    .post(allowedTo('manager'), classValidatorMiddleware(CreateShopTypeDto), createShopType);
+    .post(allowedTo('manager'), createShopTypeValidator, createShopType);
 
 shopTypesRoute.get('/list', getShopTypesList);
 
 shopTypesRoute.route("/:id")
-    .get(classValidatorMiddleware(GetShopTypeDto), getShopType)
-    .put(allowedTo('manager'), classValidatorMiddleware(UpdateShopTypeDto), updateShopType)
-    .delete(allowedTo('manager'), classValidatorMiddleware(DeleteShopTypeDto), deleteShopType);
+    .get(getShopTypeValidator, getShopType)
+    .put(allowedTo('manager'), updateShopTypeValidator, updateShopType)
+    .delete(allowedTo('manager'), deleteShopTypeValidator, deleteShopType);
 
 export default shopTypesRoute;
