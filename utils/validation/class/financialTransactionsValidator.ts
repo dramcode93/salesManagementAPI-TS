@@ -1,15 +1,20 @@
-import express from "express";
-import { check } from "express-validator";
-import validatorMiddleware from "../../middlewares/validatorMiddleware";
+import { IsMongoId, IsNotEmpty, IsNumber, IsString, Length } from "class-validator";
 
-export const createFinancialTransactionValidator: express.RequestHandler[] = [
-    check('money').notEmpty().withMessage("money is required").isNumeric().withMessage("money must be a number"),
-    check('transaction').notEmpty().withMessage("transaction is required"),
-    check('reason').notEmpty().withMessage("reason is required").isLength({ min: 2, max: 150 }).withMessage("reason length must be between 2 and 150"),
-    validatorMiddleware
-];
+export class CreateFinancialTransactionDto {
+    @IsNotEmpty()
+    @IsNumber()
+    money: number;
 
-export const getFinancialTransactionValidator: express.RequestHandler[] = [
-    check('id').isMongoId().withMessage("invalid financial Transaction id"),
-    validatorMiddleware
-];
+    @IsNotEmpty()
+    transaction: string;
+
+    @IsNotEmpty()
+    @IsString()
+    @Length(2, 150)
+    reason: string;
+};
+
+export class GetFinancialTransactionDto {
+    @IsMongoId()
+    id: string;
+};
