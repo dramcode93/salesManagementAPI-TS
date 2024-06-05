@@ -11,8 +11,8 @@ orderRoute.use(protectRoutes, checkActive, checkShops);
 orderRoute.route("/")
     .get(allowedTo('customer', 'user', 'admin'), filterOrders, getAllOrders)
     .post(allowedTo('customer'), createCashOrder);
-orderRoute.route("/:id").get(allowedTo('customer', 'user', 'admin'), classValidatorMiddleware(GetOrderDto), getSpecificOrder)
-orderRoute.route("/:id/pay").put(allowedTo('user', 'admin'), classValidatorMiddleware(GetOrderDto), updateOrderToPaid)
-orderRoute.route("/:id/deliver").put(allowedTo('user', 'admin'), classValidatorMiddleware(GetOrderDto), updateOrderToDelivered)
+orderRoute.route("/:id").get(allowedTo('customer', 'user', 'admin'), getOrderValidator, getSpecificOrder)
+orderRoute.route("/:id/pay").put(allowedTo('user', 'admin'), getOrderValidator, updateOrderToPaid)
+orderRoute.route("/:id/deliver").put(allowedTo('user', 'admin'), getOrderValidator, updateOrderToDelivered)
 
 export default orderRoute;

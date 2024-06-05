@@ -8,6 +8,7 @@ import { Request } from "express";
 // import { CategoryModel, ProductModel } from "../../interfaces";
 import { IsMongoId, IsNotEmpty, IsNumber, IsOptional, Length } from "class-validator";
 import { IsCategoryFound } from "./Dtos/products.dto";
+import { PartialType } from "@nestjs/mapped-types";
 
 export class createProductDto {
     @IsNotEmpty()
@@ -40,10 +41,12 @@ export class createProductDto {
     category: string;
 };
 
-// export const getProductValidator: express.RequestHandler[] = [
-//     check('id').isMongoId().withMessage("invalid product id"),
-//     validatorMiddleware
-// ];
+export class GetProductDto {
+    @IsMongoId()
+    id: string;
+}
+
+export class UpdateProductDto extends PartialType(createProductDto) { }
 
 // export const updateProductValidator: express.RequestHandler[] = [
 //     check('id').isMongoId().withMessage("invalid product id"),
