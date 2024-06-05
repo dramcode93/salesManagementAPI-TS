@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { createFinancialTransactions, filterFinancialTransactions, getFinancialTransaction, getFinancialTransactions } from "../controllers/financialTransactions";
 import { createFinancialTransactionValidator, getFinancialTransactionValidator } from "../utils/validation/financialTransactionsValidator";
+import { CreateFinancialTransactionDto, GetFinancialTransactionDto } from "../utils/validation/class/financialTransactionsValidator";
+import classValidatorMiddleware from "../middlewares/classValidatorMiddleware";
 import { allowedTo, checkActive, protectRoutes } from "../controllers/auth";
 import { checkShops } from "../controllers/shops";
 
@@ -10,8 +12,8 @@ financialTransactionsRoute.use(protectRoutes, checkActive, allowedTo('admin'), c
 
 financialTransactionsRoute.route('/')
     .get(filterFinancialTransactions, getFinancialTransactions)
-    .post(createFinancialTransactionValidator, createFinancialTransactions);
+    .post(classValidatorMiddleware(CreateFinancialTransactionDto), createFinancialTransactions);
 
-financialTransactionsRoute.route("/:id").get(getFinancialTransactionValidator, getFinancialTransaction);
+financialTransactionsRoute.route("/:id").get(classValidatorMiddleware(GetFinancialTransactionDto), getFinancialTransaction);
 
 export default financialTransactionsRoute;

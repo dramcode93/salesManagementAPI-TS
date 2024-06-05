@@ -1,8 +1,6 @@
-import express from "express";
-import { check } from "express-validator";
-import validatorMiddleware from "../../middlewares/validatorMiddleware";
+import { IsMongoId } from "class-validator";
 
-export const getOrderValidator: express.RequestHandler[] = [
-    check('id').isMongoId().withMessage("Invalid order Id"),
-    validatorMiddleware,
-];
+export class GetOrderDto {
+    @IsMongoId()
+    id: string;
+};
