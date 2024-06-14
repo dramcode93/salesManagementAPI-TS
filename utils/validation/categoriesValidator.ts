@@ -3,6 +3,17 @@ import { check } from "express-validator";
 import validatorMiddleware from "../../middlewares/validatorMiddleware";
 import productsModel from "../../models/productsModel";
 import { ProductModel } from "../../interfaces";
+import Joi from "joi";
+
+// export const createCategoryValidator = Joi.object({
+//     body: Joi.object({
+//         name: Joi.string().required().min(2).max(50).messages({
+//             "string.empty": "category name is required",
+//             "string.min": "category name length must be between 2 and 50",
+//             "string.max": "category name length must be between 2 and 50"
+//         })
+//     }).required()
+// });
 
 export const createCategoryValidator: express.RequestHandler[] = [
     check('name')
