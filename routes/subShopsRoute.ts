@@ -6,14 +6,11 @@ import { checkShops } from "../controllers/shops";
 
 const subShopsRoute: Router = Router();
 
-subShopsRoute.use(protectRoutes, checkActive, checkShops);
+subShopsRoute.route('/').get(getSubShops);
 
-subShopsRoute.route('/')
-    .get(getSubShops)
-    .post(allowedTo('admin'), createSubShopValidator, createSubShop);
+subShopsRoute.use(protectRoutes, checkActive, checkShops, allowedTo('admin'));
 
-
-subShopsRoute.use(checkShops, allowedTo('admin'));
+subShopsRoute.route('/').post(createSubShopValidator, createSubShop);
 
 subShopsRoute.route('/:id')
     .get(getSubShopValidator, getSubShop)

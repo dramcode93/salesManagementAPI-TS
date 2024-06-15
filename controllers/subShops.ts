@@ -10,15 +10,18 @@ const getSubShop = getOne<SubShopModel>(subShopsModel, 'subShops', '');
 const createSubShop = createOne<SubShopModel>(subShopsModel)
 
 const updateSubShop = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
-    const subShop: SubShopModel | null = await subShopsModel.findByIdAndUpdate(req.params.id, { name: req.body.name, address: req.body.address, shippingPrice: req.body.shippingPrice, deliveryService: req.body.deliveryService }, { new: true });
+    const subShop: SubShopModel | null = await subShopsModel.findOneAndUpdate({ _id: req.params.id, shop: req.user?.shop }, { name: req.body.name, address: req.body.address, shippingPrice: req.body.shippingPrice, deliveryService: req.body.deliveryService }, { new: true });
     if (!subShop) { return next(new ApiErrors(`No sub shop for this id`, 404)); };
     res.status(201).json({ data: subShop });
 });
 
-const checkSubShops = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
-    if (req.user?.role !== "customer") { if (!req.user?.shop) { return next(new ApiErrors("you can't do this action without shop", 400)); }; };
+const checkSubShops = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+    if (req.user?.role === "admin") {
+        const subShops = await subShopsModel.find({ shop: req.user.shop });
+        if (!subShops) { return next(new ApiErrors("you can't do this action without sub shop", 400)); };
+    };
     next();
-};
+});
 
 const addSubShopPhone = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     const subShop: SubShopModel | null = await subShopsModel.findOne({ _id: req.params.id, shop: req.user?.shop });
@@ -37,14 +40,14 @@ const deleteSubShopPhone = expressAsyncHandler(async (req: express.Request, res:
 const addSubShopPayment = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     const subShop: SubShopModel | null = await subShopsModel.findOne({ _id: req.params.id, shop: req.user?.shop });
     if (!subShop) { return next(new ApiErrors('no sub shop for this Id', 404)); };
-    await subShopsModel.findByIdAndUpdate(subShop._id, { $addToSet: { onlinePaymentMethods: req.body.paymentMethod } }, { new: true });
+    await subShopsModel.findByIdAndUpdate(subShop._id, { $addToSet: { onlinePaymentMethods: req.body.onlinePaymentMethods } }, { new: true });
     res.status(200).json({ message: 'sub shop phone added successfully' });
 });
 
 const deleteSubShopPayment = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     const subShop: SubShopModel | null = await subShopsModel.findOne({ _id: req.params.id, shop: req.user?.shop });
     if (!subShop) { return next(new ApiErrors('no sub shop for this Id', 404)); };
-    await subShopsModel.findByIdAndUpdate(subShop._id, { $pull: { onlinePaymentMethods: req.body.paymentMethod } }, { new: true });
+    await subShopsModel.findByIdAndUpdate(subShop._id, { $pull: { onlinePaymentMethods: req.body.onlinePaymentMethods } }, { new: true });
     res.status(200).json({ message: 'sub shop phone deleted successfully' });
 });
 
