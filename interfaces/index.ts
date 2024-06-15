@@ -97,6 +97,7 @@ interface OrderModel extends mongoose.Document {
 interface ShopModel extends mongoose.Document {
     name: string;
     type: ShopTypeModel[];
+    image: string;
     allMoney: number;
     productsMoney: number;
     debts: number;

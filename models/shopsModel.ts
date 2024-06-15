@@ -13,10 +13,20 @@ const shopSchema: mongoose.Schema = new mongoose.Schema<ShopModel>({
         type: mongoose.Schema.Types.ObjectId,
         ref: "shopTypes"
     }],
+    image: { type: String },
     allMoney: { type: Number, default: 0 },
     productsMoney: { type: Number, default: 0 },
     debts: { type: Number, default: 0 },
 }, { timestamps: true });
+
+const imageUrl = (document: ShopModel): void => {
+    if (document.image) {
+        const imageUrl = `${process.env.BASE_URL}/shops/${document.image}`;
+        document.image = imageUrl;
+    };
+};
+
+shopSchema.post<ShopModel>('init', (document: ShopModel): void => { imageUrl(document) }).post('save', (document: ShopModel): void => { imageUrl(document) });
 
 shopSchema.pre<ShopModel>(/^find/, function (next: mongoose.CallbackWithoutResultAndOptionalError): void {
     this.populate({ path: 'type' });
