@@ -28,7 +28,8 @@ const billSchema: mongoose.Schema = new mongoose.Schema<BillModel>({
     paidAmount: { type: Number, required: [true, 'paid Amount is required'] },
     remainingAmount: { type: Number, default: 0 },
     user: { type: mongoose.Schema.Types.ObjectId, ref: "users" },
-    shop: { type: mongoose.Schema.Types.ObjectId, ref: "shops" }
+    shop: { type: mongoose.Schema.Types.ObjectId, ref: "shops" },
+    subShop: { type: mongoose.Schema.Types.ObjectId, ref: "subShops" },
 }, { timestamps: true });
 
 billSchema.pre<BillModel>('save', async function (next: mongoose.CallbackWithoutResultAndOptionalError): Promise<void> {

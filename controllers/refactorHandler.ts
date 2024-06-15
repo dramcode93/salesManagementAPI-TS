@@ -4,7 +4,7 @@ import expressAsyncHandler from "express-async-handler";
 import ApiErrors from '../utils/errors';
 import ApiFeatures from '../utils/ApiFeatures';
 import { FilterData } from '../interfaces';
-import { sanitizeShop, sanitizeUser } from '../utils/sanitization';
+import { sanitizeShop, sanitizeSubShop, sanitizeUser } from '../utils/sanitization';
 
 export const getAll = <modelType>(model: mongoose.Model<any>, modelName: string) => expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
     let filterData: FilterData = {};
@@ -30,6 +30,10 @@ export const getAll = <modelType>(model: mongoose.Model<any>, modelName: string)
     else if (modelName === 'shops') {
         const sanitizedShops = documents.map(shop => sanitizeShop(shop));
         res.status(200).json({ results: documents.length, paginationResult, data: sanitizedShops });
+    }
+    else if (modelName === 'subShops') {
+        const sanitizedSubShops = documents.map(subShop => sanitizeSubShop(subShop));
+        res.status(200).json({ results: documents.length, paginationResult, data: sanitizedSubShops });
     }
     else { res.status(200).json({ results: documents.length, paginationResult, data: documents }); };
 });

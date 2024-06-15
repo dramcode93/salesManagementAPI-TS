@@ -30,6 +30,11 @@ interface ProductModel extends mongoose.Document {
     images: string[];
     category: mongoose.Schema.Types.ObjectId;
     shop: mongoose.Schema.Types.ObjectId;
+    subShops: SubShopProducts[];
+};
+interface SubShopProducts {
+    subShop: mongoose.Schema.Types.ObjectId;
+    quantity: number;
 };
 
 interface UserModel extends mongoose.Document {
@@ -41,6 +46,7 @@ interface UserModel extends mongoose.Document {
     role: 'manager' | 'admin' | 'user' | 'customer';
     active: boolean;
     shop: mongoose.Schema.Types.ObjectId;
+    subShop: mongoose.Schema.Types.ObjectId;
     address: Address[];
     passwordChangedAt: Date | number;
     passwordResetCode: string | undefined;
@@ -74,6 +80,7 @@ interface BillModel extends mongoose.Document {
     remainingAmount: number;
     user: mongoose.Schema.Types.ObjectId;
     shop: mongoose.Schema.Types.ObjectId;
+    subShop: mongoose.Schema.Types.ObjectId;
 };
 
 interface BillProducts {
@@ -116,7 +123,7 @@ interface SubShopModel extends mongoose.Document {
     shop: mongoose.Schema.Types.ObjectId;
 };
 
-interface OnlinePaymentMethods extends mongoose.Document {
+interface OnlinePaymentMethods {
     name: string;
     account: string;
 }
