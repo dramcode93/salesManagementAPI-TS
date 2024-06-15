@@ -97,14 +97,29 @@ interface OrderModel extends mongoose.Document {
 interface ShopModel extends mongoose.Document {
     name: string;
     type: ShopTypeModel[];
-    phone: string[];
-    address: Address[];
     allMoney: number;
     productsMoney: number;
+    debts: number;
+};
+interface SubShopModel extends mongoose.Document {
+    name: string;
+    address: Address;
+    phone: string[];
+    allMoney: number;
+    productsMoney: number;
+    debts: number;
     shippingPrice: number;
     deliveryService: boolean;
-    onlinePaymentMethods: string[];
+    onlinePaymentMethods: OnlinePaymentMethods[];
+    active: boolean;
+    shop: mongoose.Schema.Types.ObjectId;
 };
+
+interface OnlinePaymentMethods extends mongoose.Document {
+    name: string;
+    account: string;
+}
+
 interface FinancialTransactionsModel extends mongoose.Document {
     money: number;
     reason: string;
@@ -199,4 +214,4 @@ declare module 'express' {
     }
 };
 
-export { CategoryModel, CouponModel, CartModel, ProductModel, UserModel, CustomerModel, BillModel, BillProducts, OrderModel, ShopModel, ShopTypeModel, FinancialTransactionsModel, SalesModel, GovernorateModel, Address, CityModel, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery, EmailOptions, SendEmailOptions };
+export { CategoryModel, CouponModel, CartModel, ProductModel, UserModel, CustomerModel, BillModel, BillProducts, OrderModel, ShopModel, SubShopModel, ShopTypeModel, FinancialTransactionsModel, SalesModel, GovernorateModel, Address, CityModel, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery, EmailOptions, SendEmailOptions };
