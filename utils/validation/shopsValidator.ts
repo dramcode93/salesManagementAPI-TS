@@ -1,3 +1,4 @@
+import fs from "fs";
 import express from "express";
 import { check } from "express-validator";
 import validatorMiddleware from "../../middlewares/validatorMiddleware";
@@ -20,9 +21,7 @@ export const createShopValidator: express.RequestHandler[] = [
 ];
 
 export const updateShopValidator: express.RequestHandler[] = [
-    check('name')
-        .notEmpty().withMessage("shop name is required")
-        .isLength({ min: 2, max: 50 }).withMessage("name length must be between 2 and 50"),
+    check('name').optional().isLength({ min: 2, max: 50 }).withMessage("name length must be between 2 and 50"),
     validatorMiddleware
 ];
 
@@ -37,3 +36,12 @@ export const shopTypeValidator: express.RequestHandler[] = [
         }),
     validatorMiddleware
 ];
+
+
+export const deleteUploadedShopImage = (image: string): void => {
+    const imagePath: string = `uploads/shops/${image}`;
+    fs.unlink(imagePath, (err): void => {
+        if (err) { console.error(`Error deleting image ${image}: ${err}`); }
+        else { console.log(`Successfully deleted image ${image}`); };
+    });
+};

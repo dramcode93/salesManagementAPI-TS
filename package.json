@@ -5,7 +5,7 @@
   "main": "app.ts",
   "scripts": {
     "start:dev": "nodemon app.ts",
-    "start:product": "NODE_ENV=production ts-node app.ts"
+    "start:product": "NODE_ENV=production Base_URL=https://store-system-api.gleeze.com ts-node app.ts"
   },
   "keywords": [],
   "author": "",
