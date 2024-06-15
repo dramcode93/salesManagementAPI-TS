@@ -61,7 +61,6 @@ export const getOne = <modelType>(model: mongoose.Model<any>, modelName: string,
     const document: modelType[] = await mongooseQuery;
     if (!document) { return next(new ApiErrors(`No document for this id`, 404)); };
     if (modelName === "users") { res.status(200).json({ data: sanitizeUser(document) }); }
-    else if (modelName === "shops") { res.status(200).json({ data: sanitizeShop(document) }); }
     else { res.status(200).json({ data: document }); };
 });
 

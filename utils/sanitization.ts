@@ -1,5 +1,3 @@
-import { ShopModel, UserModel } from "../interfaces";
-
 export const sanitizeUser = function (user: any) {
     return {
         _id: user._id,
@@ -11,6 +9,7 @@ export const sanitizeUser = function (user: any) {
         role: user?.role,
         active: user?.active,
         shop: user?.shop,
+        subShop: user?.subShop,
     };
 };
 
@@ -19,7 +18,20 @@ export const sanitizeShop = function (shop: any) {
         _id: shop._id,
         name: shop.name,
         type: shop.type,
-        phone: shop.phone,
-        address: shop.address,
+        image: shop.image
+    };
+};
+
+export const sanitizeSubShop = function (subShop: any) {
+    return {
+        _id: subShop._id,
+        name: subShop.name,
+        address: subShop.address,
+        phone: subShop.phone,
+        onlinePaymentMethods: subShop.onlinePaymentMethods,
+        deliveryService: subShop.deliveryService,
+        shippingPrice: subShop.shippingPrice,
+        active: subShop.active,
+        shop: subShop.shop,
     };
 };

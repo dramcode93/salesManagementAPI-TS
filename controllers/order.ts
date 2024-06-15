@@ -17,7 +17,7 @@ export const createCashOrder = expressAsyncHandler(async (req: express.Request, 
 
     // * get order price depend on cart price check coupon
     const cartPrice: number = cart.totalPriceAfterDiscount ? cart.totalPriceAfterDiscount : cart.totalCartPrice;
-    const totalOrderPrice: number = cartPrice + shop.shippingPrice;
+    const totalOrderPrice: number = cartPrice// + shop.shippingPrice;
 
     // * create order with default payment cash
     cart.cartItems.map((item: BillProducts): void => { if (item.product.quantity < item.productQuantity) { return next(new ApiErrors(`the quantity for product ${item.product.name} not available now, it has ${item.product.quantity} only`, 400)); }; });

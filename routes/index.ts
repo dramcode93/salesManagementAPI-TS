@@ -13,6 +13,7 @@ import cartRoute from "./cartRoute";
 import orderRoute from "./orderRoute"
 import customersRoute from "./customersRoute";
 import shopsRoute from "./shopsRoute";
+import subShopsRoute from "./subShopsRoute";
 import shopTypesRoute from "./shopTypesRoute";
 import financialTransactionsRoute from "./financialTransactionsRoute";
 import salesRoute from "./salesRoute";
@@ -30,6 +31,7 @@ const mountRoutes = (app: express.Application): void => {
     app.use('/api/order', orderRoute);
     app.use('/api/customers', customersRoute);
     app.use('/api/shops', shopsRoute);
+    app.use('/api/subShops', subShopsRoute);
     app.use('/api/shopTypes', shopTypesRoute);
     app.use('/api/financialTransactions', financialTransactionsRoute);
     app.use('/api/sales', salesRoute);
