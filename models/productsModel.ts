@@ -42,15 +42,9 @@ const productSchema: mongoose.Schema = new mongoose.Schema<ProductModel>({
         default: 0,
     },
     images: [{ type: String }],
-    category: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "categories",
-        required: [true, 'category is required']
-    },
-    shop: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "shops"
-    }
+    category: { type: mongoose.Schema.Types.ObjectId, ref: "categories", required: [true, 'category is required'] },
+    shop: { type: mongoose.Schema.Types.ObjectId, ref: "shops" },
+    subShops: [{ subShop: { type: mongoose.Schema.Types.ObjectId, ref: "subShops" }, quantity: { type: Number } }]
 }, { timestamps: true });
 
 const imageUrl = (document: ProductModel): void => {

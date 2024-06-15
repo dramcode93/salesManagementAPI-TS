@@ -22,7 +22,7 @@ const updateUser = expressAsyncHandler(async (req: express.Request, res: express
     if (!user) { return next(new ApiErrors('no user for this Id', 404)); };
     if (req.user?.role === 'admin' && (req.user.shop.toString() !== user.shop.toString())) { return next(new ApiErrors('you can update your users only', 400)); }
     else if (user.role === 'manager') { return next(new ApiErrors('You can not update manager data', 400)); };
-    await usersModel.findByIdAndUpdate(user._id, { name: req.body.name, email: req.body.email }, { new: true });
+    await usersModel.findByIdAndUpdate(user._id, { name: req.body.name, email: req.body.email, subShop: req.body.subShop }, { new: true });
     res.status(200).json({ message: 'user updated successfully' });
 });
 

@@ -46,10 +46,8 @@ const userSchema: mongoose.Schema = new mongoose.Schema<UserModel>({
         type: Boolean,
         default: true,
     },
-    shop: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: "shops"
-    },
+    shop: { type: mongoose.Schema.Types.ObjectId, ref: "shops" },
+    subShop: { type: mongoose.Schema.Types.ObjectId, ref: "subShops" },
     passwordChangedAt: { type: Date },
     passwordResetCode: { type: String },
     passwordResetCodeExpires: { type: Date },

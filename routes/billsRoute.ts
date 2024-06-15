@@ -13,10 +13,9 @@ billsRoute.route('/')
 
 billsRoute.use(allowedTo('admin'));
 
-billsRoute.route('/:id')
-    .get(getBillValidator, getBill)
-    // .put(updateBillValidator, updateBill)
-    .delete(deleteBillValidator, deleteBill);
+billsRoute.route('/:id').get(getBillValidator, getBill);
+// .put(updateBillValidator, updateBill)
+// .delete(deleteBillValidator, deleteBill);
 
 billsRoute.get('/:id/userBills', filterBills, getBills);
 
