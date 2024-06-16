@@ -5,10 +5,11 @@ import { CreateFinancialTransactionDto, GetFinancialTransactionDto } from "../ut
 import classValidatorMiddleware from "../middlewares/classValidatorMiddleware";
 import { allowedTo, checkActive, protectRoutes } from "../controllers/auth";
 import { checkShops } from "../controllers/shops";
+import { checkSubShops } from "../controllers/subShops";
 
 const financialTransactionsRoute: Router = Router();
 
-financialTransactionsRoute.use(protectRoutes, checkActive, allowedTo('admin'), checkShops);
+financialTransactionsRoute.use(protectRoutes, checkActive, allowedTo('admin'), checkShops, checkSubShops);
 
 financialTransactionsRoute.route('/')
     .get(filterFinancialTransactions, getFinancialTransactions)

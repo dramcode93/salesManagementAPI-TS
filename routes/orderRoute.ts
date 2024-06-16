@@ -5,8 +5,9 @@ import { createCashOrder, getAllOrders, getSpecificOrder, filterOrders, updateOr
 import { getOrderValidator } from "../utils/validation/ordersValidator";
 import { GetOrderDto } from "../utils/validation/class/ordersValidator";
 import classValidatorMiddleware from "../middlewares/classValidatorMiddleware";
+import { checkSubShops } from "../controllers/subShops";
 const orderRoute = Router();
-orderRoute.use(protectRoutes, checkActive, checkShops);
+orderRoute.use(protectRoutes, checkActive, checkShops, checkSubShops);
 
 orderRoute.route("/")
     .get(allowedTo('customer', 'user', 'admin'), filterOrders, getAllOrders)

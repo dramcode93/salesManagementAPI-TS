@@ -3,9 +3,10 @@ import { createBill, deleteBill, filterBills, getBill, getBills, updateBill } fr
 import { createBillValidator, deleteBillValidator, getBillValidator, updateBillValidator } from "../utils/validation/billsValidator";
 import { allowedTo, checkActive, protectRoutes } from "../controllers/auth";
 import { checkShops } from "../controllers/shops";
+import { checkSubShops } from "../controllers/subShops";
 
 const billsRoute = Router();
-billsRoute.use(protectRoutes, checkActive, checkShops);
+billsRoute.use(protectRoutes, checkActive, checkShops, checkSubShops);
 
 billsRoute.route('/')
     .get(allowedTo('admin', 'user'), filterBills, getBills)

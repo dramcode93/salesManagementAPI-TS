@@ -91,6 +91,7 @@ interface BillProducts {
 interface OrderModel extends mongoose.Document {
     user: mongoose.Schema.Types.ObjectId;
     shop: mongoose.Schema.Types.ObjectId;
+    subShop: mongoose.Schema.Types.ObjectId;
     cartItems: BillProducts[];
     totalOrderPrice: number;
     paymentMethodType: 'cash' | 'online';
@@ -133,6 +134,7 @@ interface FinancialTransactionsModel extends mongoose.Document {
     reason: string;
     transaction: "withdraw" | "deposit";
     shop: mongoose.Schema.Types.ObjectId;
+    subShop: mongoose.Schema.Types.ObjectId;
 };
 
 interface SalesModel extends mongoose.Document {
@@ -162,6 +164,7 @@ interface CityModel extends mongoose.Document {
 interface FilterData {
     category?: string;
     shop?: string | mongoose.Schema.Types.ObjectId;
+    subShop?: string | mongoose.Schema.Types.ObjectId;
     user?: string | mongoose.Schema.Types.ObjectId;
     role?: any;
     governorate?: any;

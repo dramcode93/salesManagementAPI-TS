@@ -5,12 +5,13 @@ import { createProductDto } from "../utils/validation/class/productsValidator";
 import classValidatorMiddleware from "../middlewares/classValidatorMiddleware";
 import { allowedTo, checkActive, protectRoutes } from "../controllers/auth";
 import { checkShops } from "../controllers/shops";
+import { checkSubShops } from "../controllers/subShops";
 
 const productsRoute: Router = Router({ mergeParams: true });
 
 productsRoute.route('/customers').get(filterProducts, getProducts);
 productsRoute.route('/customers/:id').get(getProductValidator, getProduct);
-productsRoute.use(protectRoutes, checkActive, checkShops);
+productsRoute.use(protectRoutes, checkActive, checkShops, checkSubShops);
 
 productsRoute.route('/')
     .get(allowedTo('admin', 'user'), filterProducts, getProducts)

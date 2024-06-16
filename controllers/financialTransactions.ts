@@ -30,4 +30,4 @@ const filterFinancialTransactions = (req: express.Request, res: express.Response
     next();
 };
 
-export { getFinancialTransactions, getFinancialTransaction, createFinancialTransactions,filterFinancialTransactions };
+export { getFinancialTransactions, getFinancialTransaction, createFinancialTransactions, filterFinancialTransactions };

@@ -2,10 +2,12 @@ import { Router } from "express";
 import { allowedTo, checkActive, protectRoutes } from "../controllers/auth";
 import { deleteCustomer, createCustomer, filterCustomers, getCustomer, getCustomers, getCustomersList, updateCustomer, addCustomerAddress, deleteCustomerAddress, addCustomerPhone, deleteCustomerPhone } from "../controllers/customers";
 import { createCustomerValidator, customerAddressValidator, customerPhoneValidator, deleteCustomerValidator, getCustomerValidator, updateCustomerValidator } from "../utils/validation/customersValidator";
+import { checkShops } from "../controllers/shops";
+import { checkSubShops } from "../controllers/subShops";
 
 const customersRoute: Router = Router();
 
-customersRoute.use(protectRoutes, checkActive, allowedTo('admin', 'user'));
+customersRoute.use(protectRoutes, checkActive, checkShops, checkSubShops, allowedTo('admin', 'user'));
 
 customersRoute.route('/')
     .get(filterCustomers, getCustomers)
