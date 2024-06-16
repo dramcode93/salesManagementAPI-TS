@@ -13,7 +13,7 @@ const getFinancialTransaction = getOne<FinancialTransactionsModel>(financialTran
 const createFinancialTransactions = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     let money: number = 0;
     req.body.shop = req.user?.shop;
-    const subShop: SubShopModel | null = await subShopsModel.findById(req.body.subShop);
+    const subShop: SubShopModel | null = await subShopsModel.findOne({ _id: req.body.subShop, shop: req.user?.shop });
     if (!subShop) { return next(new ApiErrors("No sub shop for this id", 404)) };
     if (req.body.transaction === "deposit") { money = req.body.money; }
     else if (req.body.transaction === "withdraw") {
