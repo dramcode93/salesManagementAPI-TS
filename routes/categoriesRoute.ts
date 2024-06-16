@@ -1,9 +1,6 @@
 import { Router } from "express";
 import { DeleteCategory, createCategory, filterCategories, getCategories, getCategoriesList, getCategory, updateCategory } from "../controllers/categories";
 import { createCategoryValidator, deleteCategoryValidator, getCategoryValidator, updateCategoryValidator } from "../utils/validation/categoriesValidator";
-import { CreateCategoryDto, DeleteCategoryDto, GetCategoryDto, UpdateCategoryDto } from "../utils/validation/class/categoriesValidator";
-import classValidatorMiddleware from "../middlewares/classValidatorMiddleware";
-import joiValidatorMiddleware from "../middlewares/JoiValidatorMiddleware";
 import { allowedTo, checkActive, protectRoutes } from "../controllers/auth";
 import { checkShops } from "../controllers/shops";
 import productsRoute from "./productsRoute";

@@ -3,8 +3,6 @@ import { allowedTo, checkActive, protectRoutes } from "../controllers/auth";
 import { checkShops } from "../controllers/shops";
 import { createCashOrder, getAllOrders, getSpecificOrder, filterOrders, updateOrderToPaid, updateOrderToDelivered } from "../controllers/order"
 import { getOrderValidator } from "../utils/validation/ordersValidator";
-import { GetOrderDto } from "../utils/validation/class/ordersValidator";
-import classValidatorMiddleware from "../middlewares/classValidatorMiddleware";
 import { checkSubShops } from "../controllers/subShops";
 const orderRoute = Router();
 orderRoute.use(protectRoutes, checkActive, checkShops, checkSubShops);
