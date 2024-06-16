@@ -7,11 +7,12 @@ import joiValidatorMiddleware from "../middlewares/JoiValidatorMiddleware";
 import { allowedTo, checkActive, protectRoutes } from "../controllers/auth";
 import { checkShops } from "../controllers/shops";
 import productsRoute from "./productsRoute";
+import { checkSubShops } from "../controllers/subShops";
 
 const categoriesRoute: Router = Router();
 
 categoriesRoute.use('/:categoryId/products', productsRoute);
-categoriesRoute.use(protectRoutes, checkActive, checkShops);
+categoriesRoute.use(protectRoutes, checkActive, checkShops, checkSubShops);
 
 categoriesRoute.route('/')
     .get(allowedTo('admin', 'user'), filterCategories, getCategories)

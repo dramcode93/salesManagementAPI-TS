@@ -18,7 +18,7 @@ const DeleteProduct = deleteOne<ProductModel>(productsModel);
 const createProduct = expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
     req.body.shop = req.user?.shop;
     const product: ProductModel = await productsModel.create(req.body);
-    await shopsModel.findByIdAndUpdate(product.shop, { $inc: { productsMoney: product.quantity * product.productPrice } }, { new: true })
+    await shopsModel.findByIdAndUpdate(product.shop, { $inc: { productsMoney: product.quantity * product.productPrice } }, { new: true });
     res.status(200).json({ data: product });
 });
 

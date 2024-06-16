@@ -16,9 +16,9 @@ const updateSubShop = expressAsyncHandler(async (req: express.Request, res: expr
 });
 
 const checkSubShops = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
-    if (req.user?.role === "admin") {
-        const subShops = await subShopsModel.find({ shop: req.user.shop });
-        if (!subShops) { return next(new ApiErrors("you can't do this action without sub shop", 400)); };
+    if (req.user?.role !== "customer") {
+        const subShops = await subShopsModel.find({ shop: req.user?.shop });
+        if (subShops.length === 0) { return next(new ApiErrors("you can't do this action without sub shop", 400)); };
     };
     next();
 });

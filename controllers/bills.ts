@@ -4,12 +4,13 @@ import ApiErrors from "../utils/errors";
 import billsModel from "../models/billsModel";
 import productsModel from "../models/productsModel";
 import customersModel from "../models/customersModel";
-import { deleteOne, getAll, getOne, updateOne } from "./refactorHandler";
+import { deleteOne, getAll, getOne } from "./refactorHandler";
 import { BillModel, BillProducts, CustomerModel, FilterData } from "../interfaces";
 
 const filterBills = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
     let filterData: FilterData = {};
     filterData.shop = req.user?.shop;
+    if (req.user?.role === "user") { filterData.subShop = req.user.subShop };
     if (req.params.id) { filterData.user = req.params.id; };
     next();
 };
