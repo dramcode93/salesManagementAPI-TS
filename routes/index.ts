@@ -17,6 +17,7 @@ import subShopsRoute from "./subShopsRoute";
 import shopTypesRoute from "./shopTypesRoute";
 import financialTransactionsRoute from "./financialTransactionsRoute";
 import salesRoute from "./salesRoute";
+import subSalesRoute from "./subSalesRoute";
 
 const mountRoutes = (app: express.Application): void => {
     app.use('/api/categories', categoriesRoute);
@@ -35,6 +36,7 @@ const mountRoutes = (app: express.Application): void => {
     app.use('/api/shopTypes', shopTypesRoute);
     app.use('/api/financialTransactions', financialTransactionsRoute);
     app.use('/api/sales', salesRoute);
+    app.use('/api/subSales', subSalesRoute);
     app.all('*', (req: express.Request, res: express.Response, next: express.NextFunction) => { next(new ApiErrors(`The router ${req.originalUrl} is not found`, 400)) });
     app.use(globalErrors);
 };

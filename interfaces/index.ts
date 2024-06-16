@@ -144,6 +144,14 @@ interface SalesModel extends mongoose.Document {
     shop: mongoose.Schema.Types.ObjectId;
 };
 
+interface SubSalesModel extends mongoose.Document {
+    sales: number;
+    earnings: number;
+    createdAt: Date;
+    shop: mongoose.Schema.Types.ObjectId;
+    subShop: mongoose.Schema.Types.ObjectId;
+};
+
 interface ShopTypeModel extends mongoose.Document {
     type_ar: string;
     type_en: string;
@@ -164,7 +172,7 @@ interface CityModel extends mongoose.Document {
 interface FilterData {
     category?: string;
     shop?: string | mongoose.Schema.Types.ObjectId;
-    subShop?: string | mongoose.Schema.Types.ObjectId;
+    subShop?: any;
     user?: string | mongoose.Schema.Types.ObjectId;
     role?: any;
     governorate?: any;
@@ -225,4 +233,4 @@ declare module 'express' {
     }
 };
 
-export { CategoryModel, CouponModel, CartModel, ProductModel, UserModel, CustomerModel, BillModel, BillProducts, OrderModel, ShopModel, SubShopModel, ShopTypeModel, FinancialTransactionsModel, SalesModel, GovernorateModel, Address, CityModel, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery, EmailOptions, SendEmailOptions };
+export { CategoryModel, CouponModel, CartModel, ProductModel, UserModel, CustomerModel, BillModel, BillProducts, OrderModel, ShopModel, SubShopModel, ShopTypeModel, FinancialTransactionsModel, SalesModel, SubSalesModel, GovernorateModel, Address, CityModel, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery, EmailOptions, SendEmailOptions };
