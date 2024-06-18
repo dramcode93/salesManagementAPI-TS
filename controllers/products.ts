@@ -8,6 +8,7 @@ import { FilterData, ProductModel } from "../interfaces";
 import { uploadMultiImages } from '../middlewares/uploadFiles';
 import { deleteUploadedImages } from '../utils/validation/productsValidator';
 import { deleteOne, getAll, getAllList, getOne, updateOne } from "./refactorHandler";
+import subShopsModel from '../models/subShopsModel';
 
 const getProducts = getAll<ProductModel>(productsModel, 'products');
 const getProductsList = getAllList<ProductModel>(productsModel, '');
@@ -15,10 +16,15 @@ const getProduct = getOne<ProductModel>(productsModel, 'products', '');
 const updateProduct = updateOne<ProductModel>(productsModel);
 const DeleteProduct = deleteOne<ProductModel>(productsModel);
 
-const createProduct = expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
+const createProduct = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     req.body.shop = req.user?.shop;
+    const { quantity, subShops } = req.body;
+    const totalSubShopQuantity = subShops.reduce((acc: number, subShop: { subShop: string, quantity: number }) => acc + subShop.quantity, 0);
+    if (quantity !== totalSubShopQuantity) { return next(new ApiErrors("Quantity does not match the sum of quantities in subShops", 400)); };
     const product: ProductModel = await productsModel.create(req.body);
     await shopsModel.findByIdAndUpdate(product.shop, { $inc: { productsMoney: product.quantity * product.productPrice } }, { new: true });
+    const updatePromises = subShops.map((subShop: { subShop: string, quantity: number }) => { return subShopsModel.findByIdAndUpdate(subShop.subShop, { $inc: { productsMoney: subShop.quantity * req.body.productPrice } }, { new: true }); });
+    await Promise.all(updatePromises);
     res.status(200).json({ data: product });
 });
 
