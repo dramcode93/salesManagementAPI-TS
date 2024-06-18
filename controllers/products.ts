@@ -23,8 +23,15 @@ const createProduct = expressAsyncHandler(async (req: express.Request, res: expr
     if (quantity !== totalSubShopQuantity) { return next(new ApiErrors("Quantity does not match the sum of quantities in subShops", 400)); };
     const product: ProductModel = await productsModel.create(req.body);
     await shopsModel.findByIdAndUpdate(product.shop, { $inc: { productsMoney: product.quantity * product.productPrice } }, { new: true });
-    const updatePromises = subShops.map((subShop: { subShop: string, quantity: number }) => { return subShopsModel.findByIdAndUpdate(subShop.subShop, { $inc: { productsMoney: subShop.quantity * req.body.productPrice } }, { new: true }); });
-    await Promise.all(updatePromises);
+    // ! const updatePromises = subShops.map((subShop: { subShop: string, quantity: number }) => { return subShopsModel.findByIdAndUpdate(subShop.subShop, { $inc: { productsMoney: subShop.quantity * req.body.productPrice } }, { new: true }); });
+    // ! await Promise.all(updatePromises);
+    const bulkOperations = subShops.map((subShop: { subShop: string, quantity: number }) => ({
+        updateOne: {
+            filter: { _id: subShop.subShop },
+            update: { $inc: { productsMoney: subShop.quantity * req.body.productPrice } }
+        }
+    }));
+    await subShopsModel.bulkWrite(bulkOperations);
     res.status(200).json({ data: product });
 });
 
