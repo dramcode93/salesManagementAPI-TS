@@ -10,7 +10,8 @@ export const createSubShopValidator: express.RequestHandler[] = [
         .notEmpty().withMessage("sub shop name is required")
         .isLength({ min: 2, max: 50 }).withMessage("shop name length must be between 2 and 50"),
     check('deliveryService').notEmpty().withMessage("delivery service is required").isBoolean().withMessage("delivery Service must be boolean value"),
-    check('shippingPrice').optional().isNumeric().withMessage("shipping Price must be number"),
+    check('shippingPriceInside').optional().isNumeric().withMessage("shipping Price must be number"),
+    check('shippingPriceOutside').optional().isNumeric().withMessage("shipping Price must be number"),
     check('phone').notEmpty().withMessage("phone number can't be empty").isMobilePhone('ar-EG').withMessage('Invalid phone number'),
     check('address').notEmpty().withMessage("sub shop address is required")
         .custom(async (address: Address): Promise<boolean> => {
@@ -33,10 +34,11 @@ export const updateSubShopValidator: express.RequestHandler[] = [
     check('name').optional().isLength({ min: 2, max: 50 }).withMessage("name length must be between 2 and 50"),
     check('deliveryService').optional().isBoolean().withMessage("delivery Service must be boolean value")
         .custom((deliveryService: boolean, { req }) => {
-            if (deliveryService === false) { req.body.shippingPrice = 0 };
+            if (deliveryService === false) { req.body.shippingPriceInside = 0; req.body.shippingPriceOutside = 0 };
             return true;
         }),
-    check('shippingPrice').optional().isNumeric().withMessage("shipping Price must be number"),
+    check('shippingPriceInside').optional().isNumeric().withMessage("shipping Price must be number"),
+    check('shippingPriceOutside').optional().isNumeric().withMessage("shipping Price must be number"),
     check('address').optional()
         .custom(async (address: Address): Promise<boolean> => {
             const governorate: GovernorateModel | null = await governoratesModel.findById(address.governorate);

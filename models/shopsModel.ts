@@ -21,7 +21,7 @@ const shopSchema: mongoose.Schema = new mongoose.Schema<ShopModel>({
 
 const imageUrl = (document: ShopModel): void => {
     if (document.image) {
-        const imageUrl = `${process.env.BASE_URL}/shops/${document.image}`;
+        const imageUrl: string = `https://store-system-api.gleeze.com/shops/${document.image}`;
         document.image = imageUrl;
     };
 };

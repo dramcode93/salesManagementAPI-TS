@@ -10,7 +10,7 @@ const getSubShop = getOne<SubShopModel>(subShopsModel, 'subShops', '');
 const createSubShop = createOne<SubShopModel>(subShopsModel)
 
 const updateSubShop = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
-    const subShop: SubShopModel | null = await subShopsModel.findOneAndUpdate({ _id: req.params.id, shop: req.user?.shop }, { name: req.body.name, address: req.body.address, shippingPrice: req.body.shippingPrice, deliveryService: req.body.deliveryService }, { new: true });
+    const subShop: SubShopModel | null = await subShopsModel.findOneAndUpdate({ _id: req.params.id, shop: req.user?.shop }, { name: req.body.name, address: req.body.address, shippingPriceInside: req.body.shippingPriceInside, shippingPriceOutside: req.body.shippingPriceOutside, deliveryService: req.body.deliveryService }, { new: true });
     if (!subShop) { return next(new ApiErrors(`No sub shop for this id`, 404)); };
     res.status(201).json({ data: subShop });
 });
