@@ -117,7 +117,8 @@ interface SubShopModel extends mongoose.Document {
     allMoney: number;
     productsMoney: number;
     debts: number;
-    shippingPrice: number;
+    shippingPriceInside: number;
+    shippingPriceOutside: number;
     deliveryService: boolean;
     onlinePaymentMethods: OnlinePaymentMethods[];
     active: boolean;

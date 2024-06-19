@@ -4,11 +4,11 @@ import sharp from 'sharp';
 import ApiErrors from '../utils/errors';
 import productsModel from "../models/productsModel";
 import shopsModel from '../models/shopsModel';
+import subShopsModel from '../models/subShopsModel';
 import { FilterData, ProductModel } from "../interfaces";
 import { uploadMultiImages } from '../middlewares/uploadFiles';
 import { deleteUploadedImages } from '../utils/validation/productsValidator';
 import { deleteOne, getAll, getAllList, getOne, updateOne } from "./refactorHandler";
-import subShopsModel from '../models/subShopsModel';
 
 const getProducts = getAll<ProductModel>(productsModel, 'products');
 const getProductsList = getAllList<ProductModel>(productsModel, '');
