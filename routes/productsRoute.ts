@@ -1,5 +1,5 @@
 import { Router } from "express";
-import { DeleteProduct, addProductCategory, addProductImages, createProduct, deleteProductImage, filterProducts, getProduct, getProducts, getProductsList, resizeImage, updateProduct, uploadProductImages } from "../controllers/products";
+import { DeleteProduct, addProductCategory, addProductImages, createProduct, deleteProductImage, filterProducts, getProduct, getProducts, getProductsList, resizeImage, updateProduct, updateQuantity, uploadProductImages } from "../controllers/products";
 import { ProductImagesValidator, createProductValidator, deleteProductValidator, getProductValidator, updateProductValidator } from "../utils/validation/productsValidator";
 import { allowedTo, checkActive, protectRoutes } from "../controllers/auth";
 import { checkShops } from "../controllers/shops";
@@ -21,6 +21,9 @@ productsRoute.route("/:id")
     .get(allowedTo('admin', 'user'), getProductValidator, getProduct)
     .put(allowedTo('admin'), updateProductValidator, updateProduct)
     .delete(allowedTo('admin'), deleteProductValidator, DeleteProduct);
+
+productsRoute.route("/:id/updateQuantity").put(allowedTo('admin'), getProductValidator, updateQuantity);
+// productsRoute.route("/:id/transportQuantity").put(allowedTo('admin'), getProductValidator, updateQuantity);
 
 productsRoute.use(allowedTo('admin', 'user'));
 productsRoute.route("/:id/images")
