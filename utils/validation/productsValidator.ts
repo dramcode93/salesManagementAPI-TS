@@ -55,14 +55,7 @@ export const updateProductValidator: express.RequestHandler[] = [
             return true;
         }),
     check('quantity').optional().isNumeric().withMessage('Quantity Must be a number').toInt()
-        .custom(async (quantity: number, { req }) => {
-            if (quantity < 0) { return Promise.reject(new Error('Quantity must be greater than 0')); };
-            const product: ProductModel | null = await productsModel.findById(req.params?.id)
-            if (!product) { return Promise.reject(new Error('Product Not found')); };
-            const compareQuantity: number = quantity - product.quantity;
-            await shopsModel.findByIdAndUpdate(product.shop, { $inc: { productsMoney: compareQuantity * product.productPrice } }, { new: true });
-            return true;
-        }),
+        .custom(async (quantity: number) => { if (quantity) { return Promise.reject(new Error('you can not update Quantity here')); }; return true; }),
     validatorMiddleware
 ];
 

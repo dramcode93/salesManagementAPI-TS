@@ -35,6 +35,20 @@ const createProduct = expressAsyncHandler(async (req: express.Request, res: expr
     res.status(200).json({ data: product });
 });
 
+const updateQuantity = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+    const subShops: { subShop: string, quantity: number } = req.body.subShops;
+    if (!subShops || !subShops.subShop || !subShops.quantity || subShops.quantity < 0) { return next(new ApiErrors("Invalid request body", 400)); };
+    const product: ProductModel | null = await productsModel.findById(req.params.id);
+    if (!product) { return next(new ApiErrors("Product not found", 404)); };
+    const subShopIndex: number = product.subShops.findIndex(shop => shop.subShop.toString() === subShops.subShop);
+    if (subShopIndex === -1) { return next(new ApiErrors("SubShop not found in product", 404)); };
+    const newQuantity: number = subShops.quantity - product.subShops[subShopIndex].quantity;
+    await productsModel.findByIdAndUpdate(req.params.id, { $inc: { quantity: newQuantity, [`subShops.${subShopIndex}.quantity`]: newQuantity } }, { new: true });
+    await subShopsModel.findByIdAndUpdate(subShops.subShop, { $inc: { productsMoney: product.productPrice * newQuantity } }, { new: true });
+    await shopsModel.findByIdAndUpdate(product.shop, { $inc: { productsMoney: product.productPrice * newQuantity } }, { new: true });
+    res.status(200).json({ data: product });
+});
+
 const addProductCategory = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
     if (!req.body.category) { req.body.category = req.params.categoryId }; next();
 };
@@ -90,4 +104,4 @@ const deleteProductImage = expressAsyncHandler(async (req: express.Request, res:
     res.status(200).json({ product });
 });
 
-export { getProducts, getProductsList, createProduct, getProduct, updateProduct, DeleteProduct, addProductCategory, filterProducts, uploadProductImages, resizeImage, addProductImages, deleteProductImage };
+export { getProducts, getProductsList, createProduct, getProduct, updateProduct, updateQuantity, DeleteProduct, addProductCategory, filterProducts, uploadProductImages, resizeImage, addProductImages, deleteProductImage };
