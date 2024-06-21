@@ -4,6 +4,7 @@ import ordersModel from '../models/orderModel';
 import carts from "../models/cartModel";
 import productsModel from "../models/productsModel";
 import shopsModel from '../models/shopsModel';
+import subShopsModel from '../models/subShopsModel';
 import ApiErrors from "../utils/errors";
 import { getAll, getOne } from "./refactorHandler";
 import { OrderModel, CartModel, BillProducts, ShopModel } from '../interfaces';
@@ -54,19 +55,21 @@ export const getSpecificOrder = getOne<OrderModel>(ordersModel, 'orders', '')
 
 export const updateOrderToPaid = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     const order: OrderModel | null = await ordersModel.findById(req.params.id);
-    if (!order) { return next(new ApiErrors(`there is no order with this id : ${req.params.id}`, 404)); };
+    if (!order || order.isPaid === true) { return next(new ApiErrors(`there is no order with this id : ${req.params.id} or order already paid`, 404)); };
     order.isPaid = true;
     order.paidAt = Date.now();
     const updatedOrder: OrderModel = await order.save();
+    await shopsModel.findByIdAndUpdate(order.shop, { $inc: { allMoney: order.totalOrderPrice } }, { new: true });
+    await subShopsModel.findByIdAndUpdate(order.subShop, { allMoney: order.totalOrderPrice }, { new: true });
     res.status(200).json({ status: 'success', data: updatedOrder });
 });
 
 export const updateOrderToDelivered = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     const order: OrderModel | null = await ordersModel.findById(req.params.id);
-    if (!order) { return next(new ApiErrors(`there is no order with this id : ${req.params.id}`, 404)); };
+    if (!order || order.isDelivered === true) { return next(new ApiErrors(`there is no order with this id : ${req.params.id} or order already delivered`, 404)); };
     order.isDelivered = true;
     order.deliveredAt = Date.now();
-    const updatedOrder = await order.save();
+    const updatedOrder: OrderModel = await order.save();
     const bulkOption = order.cartItems.map((items: BillProducts) => ({
         updateOne: {
             filter: { _id: items.product },

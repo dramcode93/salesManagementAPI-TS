@@ -13,12 +13,14 @@ const uploadShopImage = uploadSingleImage("image");
 
 const resizeShopImage = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     if (req.file) {
+        let imageName: string = ``;
         const shop: ShopModel | null = await shopsModel.findById(req.params.id);
         if (shop?.image) {
             const image: string = shop.image.split(`${process.env.Base_URL}/shops/`)[1];
             deleteUploadedShopImage(image);
         };
-        let imageName: string = `shop-${req.body.name}-${Date.now()}.jpeg`;
+        if (req.body.name) { imageName = `shop-${req.body.name}-${Date.now()}.jpeg`; }
+        else { imageName = `shop-${shop?.name}-${Date.now()}.jpeg` };
         await sharp(req.file.buffer)
             .toFormat('jpeg')
             .jpeg({ quality: 95 })

@@ -59,6 +59,14 @@ export const updateProductValidator: express.RequestHandler[] = [
     validatorMiddleware
 ];
 
+export const transportProductQuantityValidator: express.RequestHandler[] = [
+    check('id').isMongoId().withMessage("invalid product id"),
+    check('from').notEmpty().withMessage("sub shop 1 is required").isMongoId().withMessage("invalid sub shop id"),
+    check('to').notEmpty().withMessage("sub shop 2 is required").isMongoId().withMessage("invalid sub shop id"),
+    check('quantity').notEmpty().withMessage("quantity is required").isNumeric().withMessage('quantity Must be a number').toInt(),
+    validatorMiddleware
+];
+
 export const ProductImagesValidator: express.RequestHandler[] = [
     check('images').notEmpty().withMessage('product images is required')
         .custom(async (images: string[], { req }): Promise<boolean> => {

@@ -30,7 +30,8 @@ export const sanitizeSubShop = function (subShop: any) {
         phone: subShop.phone,
         onlinePaymentMethods: subShop.onlinePaymentMethods,
         deliveryService: subShop.deliveryService,
-        shippingPrice: subShop.shippingPrice,
+        shippingPriceInside: subShop.shippingPriceInside,
+        shippingPriceOutside: subShop.shippingPriceOutside,
         active: subShop.active,
         shop: subShop.shop,
     };
