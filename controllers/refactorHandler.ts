@@ -42,8 +42,8 @@ export const getAllList = <modelType>(model: mongoose.Model<any>, population: st
     let filterData: FilterData = {};
     let apiFeatures: ApiFeatures;
     if (req.filterData) { filterData = req.filterData; };
-    if (population !== '') { apiFeatures = new ApiFeatures(model.find(filterData).populate(population), req.query).sort().limitFields(); }
-    else { apiFeatures = new ApiFeatures(model.find(filterData), req.query).sort().limitFields(); };
+    if (population !== '') { apiFeatures = new ApiFeatures(model.find(filterData).populate(population), req.query).filter().sort().limitFields(); }
+    else { apiFeatures = new ApiFeatures(model.find(filterData), req.query).filter().sort().limitFields(); };
     const { mongooseQuery } = apiFeatures;
     const documents: modelType[] = await mongooseQuery;
     res.status(200).json({ results: documents.length, data: documents });

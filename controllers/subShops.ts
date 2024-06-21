@@ -2,10 +2,11 @@ import express from "express";
 import expressAsyncHandler from "express-async-handler";
 import ApiErrors from "../utils/errors";
 import { SubShopModel } from "../interfaces";
-import { createOne, getAll, getOne } from "./refactorHandler";
+import { createOne, getAll, getAllList, getOne } from "./refactorHandler";
 import subShopsModel from "../models/subShopsModel";
 
 const getSubShops = getAll<SubShopModel>(subShopsModel, 'subShops');
+const getSubShopsList = getAllList<SubShopModel>(subShopsModel, '');
 const getSubShop = getOne<SubShopModel>(subShopsModel, 'subShops', '');
 const createSubShop = createOne<SubShopModel>(subShopsModel)
 
@@ -58,4 +59,4 @@ const changeSubShopActivation = expressAsyncHandler(async (req: express.Request,
     res.status(200).json({ message: 'sub shop activation updated successfully' });
 });
 
-export { getSubShops, getSubShop, createSubShop, updateSubShop, checkSubShops, addSubShopPhone, deleteSubShopPhone, changeSubShopActivation, addSubShopPayment, deleteSubShopPayment };
+export { getSubShops, getSubShop, getSubShopsList, createSubShop, updateSubShop, checkSubShops, addSubShopPhone, deleteSubShopPhone, changeSubShopActivation, addSubShopPayment, deleteSubShopPayment };
