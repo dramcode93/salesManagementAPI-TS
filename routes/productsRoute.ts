@@ -1,6 +1,6 @@
 import { Router } from "express";
-import { DeleteProduct, addProductCategory, addProductImages, createProduct, deleteProductImage, filterProducts, getProduct, getProducts, getProductsList, resizeImage, updateProduct, updateQuantity, uploadProductImages } from "../controllers/products";
-import { ProductImagesValidator, createProductValidator, deleteProductValidator, getProductValidator, updateProductValidator } from "../utils/validation/productsValidator";
+import { DeleteProduct, addProductCategory, addProductImages, createProduct, deleteProductImage, filterProducts, getProduct, getProducts, getProductsList, resizeImage, transportQuantity, updateProduct, updateQuantity, uploadProductImages } from "../controllers/products";
+import { ProductImagesValidator, createProductValidator, deleteProductValidator, getProductValidator, transportProductQuantityValidator, updateProductValidator } from "../utils/validation/productsValidator";
 import { allowedTo, checkActive, protectRoutes } from "../controllers/auth";
 import { checkShops } from "../controllers/shops";
 import { checkSubShops } from "../controllers/subShops";
@@ -23,7 +23,7 @@ productsRoute.route("/:id")
     .delete(allowedTo('admin'), deleteProductValidator, DeleteProduct);
 
 productsRoute.route("/:id/updateQuantity").put(allowedTo('admin'), getProductValidator, updateQuantity);
-// productsRoute.route("/:id/transportQuantity").put(allowedTo('admin'), getProductValidator, updateQuantity);
+productsRoute.route("/:id/transportQuantity").put(allowedTo('admin'), transportProductQuantityValidator, transportQuantity);
 
 productsRoute.use(allowedTo('admin', 'user'));
 productsRoute.route("/:id/images")

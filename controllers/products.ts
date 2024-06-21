@@ -5,7 +5,7 @@ import ApiErrors from '../utils/errors';
 import productsModel from "../models/productsModel";
 import shopsModel from '../models/shopsModel';
 import subShopsModel from '../models/subShopsModel';
-import { FilterData, ProductModel } from "../interfaces";
+import { FilterData, ProductModel, SubShopModel } from "../interfaces";
 import { uploadMultiImages } from '../middlewares/uploadFiles';
 import { deleteUploadedImages } from '../utils/validation/productsValidator';
 import { deleteOne, getAll, getAllList, getOne, updateOne } from "./refactorHandler";
@@ -47,6 +47,20 @@ const updateQuantity = expressAsyncHandler(async (req: express.Request, res: exp
     await subShopsModel.findByIdAndUpdate(subShops.subShop, { $inc: { productsMoney: product.productPrice * newQuantity } }, { new: true });
     await shopsModel.findByIdAndUpdate(product.shop, { $inc: { productsMoney: product.productPrice * newQuantity } }, { new: true });
     res.status(200).json({ data: product });
+});
+
+const transportQuantity = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+    const fromSubShop: SubShopModel | null = await subShopsModel.findById(req.body.from);
+    const toSubShop: SubShopModel | null = await subShopsModel.findById(req.body.to);
+    const product: ProductModel | null = await productsModel.findById(req.params.id);
+    if (!product || !fromSubShop || !toSubShop) { return next(new ApiErrors("Product or sub shop not found", 404)); };
+    const fromSubShopIndex: number = product.subShops.findIndex(shop => shop.subShop.toString() === req.body.from.toString());
+    const toSubShopIndex: number = product.subShops.findIndex(shop => shop.subShop.toString() === req.body.to.toString());
+    if (fromSubShopIndex === -1 || toSubShopIndex === -1) { return next(new ApiErrors("SubShop not found in product", 404)); };
+    await productsModel.findByIdAndUpdate(req.params.id, { $inc: { [`subShops.${fromSubShopIndex}.quantity`]: -req.body.quantity, [`subShops.${toSubShopIndex}.quantity`]: req.body.quantity } }, { new: true });
+    await subShopsModel.findByIdAndUpdate(req.body.from, { $inc: { productsMoney: - product.productPrice * req.body.quantity } }, { new: true });
+    await subShopsModel.findByIdAndUpdate(req.body.to, { $inc: { productsMoney: product.productPrice * req.body.quantity } }, { new: true });
+    res.status(200).json({ data: "quantity of product transported successfully" });
 });
 
 const addProductCategory = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
@@ -91,7 +105,7 @@ const addProductImages = expressAsyncHandler(async (req: express.Request, res: e
     const product: ProductModel | null = await productsModel.findById(req.params.id);
     if (!product) { return next(new ApiErrors('no product for this Id', 404)); };
     await productsModel.findByIdAndUpdate(product._id, { $addToSet: { images: req.body.images } }, { new: true });
-    res.status(200).json({ product });
+    res.status(200).json({ data: product });
 });
 
 const deleteProductImage = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
@@ -101,7 +115,7 @@ const deleteProductImage = expressAsyncHandler(async (req: express.Request, res:
     const productImages: string[] = [];
     productImages.push(req.body.images);
     deleteUploadedImages(productImages);
-    res.status(200).json({ product });
+    res.status(200).json({ data: product });
 });
 
-export { getProducts, getProductsList, createProduct, getProduct, updateProduct, updateQuantity, DeleteProduct, addProductCategory, filterProducts, uploadProductImages, resizeImage, addProductImages, deleteProductImage };
+export { getProducts, getProductsList, createProduct, getProduct, updateProduct, updateQuantity, transportQuantity, DeleteProduct, addProductCategory, filterProducts, uploadProductImages, resizeImage, addProductImages, deleteProductImage };
