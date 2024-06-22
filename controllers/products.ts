@@ -61,9 +61,14 @@ const transportQuantity = expressAsyncHandler(async (req: express.Request, res: 
     const product: ProductModel | null = await productsModel.findById(req.params.id);
     if (!product || !fromSubShop || !toSubShop) { return next(new ApiErrors("Product or sub shop not found", 404)); };
     const fromSubShopIndex: number = product.subShops.findIndex(shop => shop.subShop.toString() === req.body.from.toString());
+    if (fromSubShopIndex === -1) { return next(new ApiErrors("'from' SubShop not found in product", 404)); };
     const toSubShopIndex: number = product.subShops.findIndex(shop => shop.subShop.toString() === req.body.to.toString());
-    if (fromSubShopIndex === -1 || toSubShopIndex === -1) { return next(new ApiErrors("SubShop not found in product", 404)); };
-    await productsModel.findByIdAndUpdate(req.params.id, { $inc: { [`subShops.${fromSubShopIndex}.quantity`]: -req.body.quantity, [`subShops.${toSubShopIndex}.quantity`]: req.body.quantity } }, { new: true });
+    if (product.subShops[fromSubShopIndex].quantity < req.body.quantity) { return next(new ApiErrors("not enough quantity in this sub shop", 400)) };
+    if (toSubShopIndex === -1) {
+        await productsModel.findByIdAndUpdate(req.params.id, { $inc: { [`subShops.${fromSubShopIndex}.quantity`]: -req.body.quantity } }, { new: true });
+        await productsModel.findByIdAndUpdate(req.params.id, { $addToSet: { subShops: { subShop: req.body.to, quantity: req.body.quantity } } }, { new: true });
+    }
+    else { await productsModel.findByIdAndUpdate(req.params.id, { $inc: { [`subShops.${fromSubShopIndex}.quantity`]: -req.body.quantity, [`subShops.${toSubShopIndex}.quantity`]: req.body.quantity } }, { new: true }); };
     await subShopsModel.findByIdAndUpdate(req.body.from, { $inc: { productsMoney: - product.productPrice * req.body.quantity } }, { new: true });
     await subShopsModel.findByIdAndUpdate(req.body.to, { $inc: { productsMoney: product.productPrice * req.body.quantity } }, { new: true });
     res.status(200).json({ data: "quantity of product transported successfully" });
