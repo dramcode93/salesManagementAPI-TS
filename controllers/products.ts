@@ -40,13 +40,19 @@ const updateQuantity = expressAsyncHandler(async (req: express.Request, res: exp
     if (!subShops || !subShops.subShop || !subShops.quantity || subShops.quantity < 0) { return next(new ApiErrors("Invalid request body", 400)); };
     const product: ProductModel | null = await productsModel.findById(req.params.id);
     if (!product) { return next(new ApiErrors("Product not found", 404)); };
+    let newQuantity: number = 0;
     const subShopIndex: number = product.subShops.findIndex(shop => shop.subShop.toString() === subShops.subShop);
-    if (subShopIndex === -1) { return next(new ApiErrors("SubShop not found in product", 404)); };
-    const newQuantity: number = subShops.quantity - product.subShops[subShopIndex].quantity;
-    await productsModel.findByIdAndUpdate(req.params.id, { $inc: { quantity: newQuantity, [`subShops.${subShopIndex}.quantity`]: newQuantity } }, { new: true });
+    if (subShopIndex === -1) {
+        newQuantity = subShops.quantity;
+        await productsModel.findByIdAndUpdate(req.params.id, { $addToSet: { subShops: subShops }, $inc: { quantity: newQuantity } }, { new: true });
+    }
+    else {
+        newQuantity = subShops.quantity - product.subShops[subShopIndex].quantity;
+        await productsModel.findByIdAndUpdate(req.params.id, { $inc: { quantity: newQuantity, [`subShops.${subShopIndex}.quantity`]: newQuantity } }, { new: true });
+    };
     await subShopsModel.findByIdAndUpdate(subShops.subShop, { $inc: { productsMoney: product.productPrice * newQuantity } }, { new: true });
     await shopsModel.findByIdAndUpdate(product.shop, { $inc: { productsMoney: product.productPrice * newQuantity } }, { new: true });
-    res.status(200).json({ data: product });
+    res.status(200).json({ data: "product quantity updated successfully" });
 });
 
 const transportQuantity = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
