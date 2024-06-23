@@ -54,7 +54,7 @@ const addShopType = expressAsyncHandler(async (req: express.Request, res: expres
 
 const deleteShopType = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     const shop: ShopModel | null = await shopsModel.findById(req.params.id);
-    if (!shop) { return next(new ApiErrors('no shop for this Id', 404)); };
+    if (!shop || shop.type.length === 1) { return next(new ApiErrors('you must have at least one type or no shop for this Id', 400)); };
     await shopsModel.findByIdAndUpdate(shop._id, { $pull: { type: req.body.type } }, { new: true });
     res.status(200).json({ message: 'shop type deleted successfully' });
 });

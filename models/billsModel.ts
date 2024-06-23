@@ -2,8 +2,12 @@ import mongoose from "mongoose";
 import dailySalesModel from "./dailySalesModel";
 import monthlySalesModel from "./monthlySalesModel";
 import yearlySalesModel from "./yearlySalesModel";
-import { BillModel, SalesModel } from "../interfaces";
+import { BillModel, SalesModel, SubSalesModel } from "../interfaces";
 import shopsModel from "./shopsModel";
+import dailySubSalesModel from "./dailySubSalesModel";
+import monthlySubSalesModel from "./monthlySubSalesModel";
+import yearlySubSalesModel from "./yearlySubSalesModel";
+import subShopsModel from "./subShopsModel";
 
 const billSchema: mongoose.Schema = new mongoose.Schema<BillModel>({
     customer: {
@@ -50,37 +54,68 @@ billSchema.pre<BillModel>('save', async function (next: mongoose.CallbackWithout
     else { this.totalAmountAfterDiscount = this.totalAmountBeforeDiscount; };
     this.remainingAmount = this.totalAmountAfterDiscount - this.paidAmount;
 
-    // * daily sales
+    // * Daily
+    // ? Sales
     const startOfDay: Date = new Date(date.setHours(0, 0, 0, 0));
     const endOfDay: Date = new Date(date.setHours(23, 59, 59, 999));
     const dailySales: SalesModel | null = await dailySalesModel.findOne({ shop: this.shop, createdAt: { $gte: startOfDay, $lt: endOfDay } });
-    if (!dailySales) { await dailySalesModel.create({ sales: this.totalAmountAfterDiscount, earnings: this.totalAmountAfterDiscount - totalProductPrice, shop: this.shop }); }
+    if (!dailySales) { await dailySalesModel.create({ sales: this.paidAmount, earnings: this.totalAmountAfterDiscount - totalProductPrice, shop: this.shop }); }
     else {
-        dailySales.sales += this.totalAmountAfterDiscount;
+        dailySales.sales += this.paidAmount;
         dailySales.earnings += (this.totalAmountAfterDiscount - totalProductPrice);
         dailySales.save();
     };
 
-    // * monthly sales
-    const monthlySales: SalesModel | null = await monthlySalesModel.findOne({ shop: this.shop, $expr: { $and: [{ $eq: [{ $year: "$createdAt" }, date.getFullYear()] }, { $eq: [{ $month: "$createdAt" }, date.getMonth() + 1] }] } });
-    if (!monthlySales) { await monthlySalesModel.create({ sales: this.totalAmountAfterDiscount, earnings: this.totalAmountAfterDiscount - totalProductPrice, shop: this.shop }); }
+    // ? Sub Sales
+    const dailySubSales: SubSalesModel | null = await dailySubSalesModel.findOne({ shop: this.shop, subShop: this.subShop, createdAt: { $gte: startOfDay, $lt: endOfDay } });
+    if (!dailySubSales) { await dailySubSalesModel.create({ sales: this.paidAmount, earnings: this.totalAmountAfterDiscount - totalProductPrice, shop: this.shop, subShop: this.subShop }); }
     else {
-        monthlySales.sales += this.totalAmountAfterDiscount;
+        dailySubSales.sales += this.paidAmount;
+        dailySubSales.earnings += (this.totalAmountAfterDiscount - totalProductPrice);
+        dailySubSales.save();
+    };
+
+    // * Monthly
+    // ? Sales
+    const monthlySales: SalesModel | null = await monthlySalesModel.findOne({ shop: this.shop, $expr: { $and: [{ $eq: [{ $year: "$createdAt" }, date.getFullYear()] }, { $eq: [{ $month: "$createdAt" }, date.getMonth() + 1] }] } });
+    if (!monthlySales) { await monthlySalesModel.create({ sales: this.paidAmount, earnings: this.totalAmountAfterDiscount - totalProductPrice, shop: this.shop }); }
+    else {
+        monthlySales.sales += this.paidAmount;
         monthlySales.earnings += (this.totalAmountAfterDiscount - totalProductPrice);
         monthlySales.save();
     };
 
-    // * yearly sales
-    const yearlySales: SalesModel | null = await yearlySalesModel.findOne({ shop: this.shop, $expr: { $eq: [{ $year: "$createdAt" }, date.getFullYear()] } });
-    if (!yearlySales) { await yearlySalesModel.create({ sales: this.totalAmountAfterDiscount, earnings: this.totalAmountAfterDiscount - totalProductPrice, shop: this.shop }); }
+    // ? Sub Sales
+    const monthlySubSales: SubSalesModel | null = await monthlySubSalesModel.findOne({ shop: this.shop, subShop: this.subShop, $expr: { $and: [{ $eq: [{ $year: "$createdAt" }, date.getFullYear()] }, { $eq: [{ $month: "$createdAt" }, date.getMonth() + 1] }] } });
+    if (!monthlySubSales) { await monthlySubSalesModel.create({ sales: this.paidAmount, earnings: this.totalAmountAfterDiscount - totalProductPrice, shop: this.shop, subShop: this.subShop }); }
     else {
-        yearlySales.sales += this.totalAmountAfterDiscount;
+        monthlySubSales.sales += this.paidAmount;
+        monthlySubSales.earnings += (this.totalAmountAfterDiscount - totalProductPrice);
+        monthlySubSales.save();
+    };
+
+    // * Yearly
+    // ? Sales
+    const yearlySales: SalesModel | null = await yearlySalesModel.findOne({ shop: this.shop, $expr: { $eq: [{ $year: "$createdAt" }, date.getFullYear()] } });
+    if (!yearlySales) { await yearlySalesModel.create({ sales: this.paidAmount, earnings: this.totalAmountAfterDiscount - totalProductPrice, shop: this.shop }); }
+    else {
+        yearlySales.sales += this.paidAmount;
         yearlySales.earnings += (this.totalAmountAfterDiscount - totalProductPrice);
         yearlySales.save();
     };
 
-    // * shop money
+    // ? Sub Sales
+    const yearlySubSales: SubSalesModel | null = await yearlySubSalesModel.findOne({ shop: this.shop, subShop: this.subShop, $expr: { $eq: [{ $year: "$createdAt" }, date.getFullYear()] } });
+    if (!yearlySubSales) { await yearlySubSalesModel.create({ sales: this.paidAmount, earnings: this.totalAmountAfterDiscount - totalProductPrice, shop: this.shop, subShop: this.subShop }); }
+    else {
+        yearlySubSales.sales += this.paidAmount;
+        yearlySubSales.earnings += (this.totalAmountAfterDiscount - totalProductPrice);
+        yearlySubSales.save();
+    };
+
+    // * update shop & sub shop products money
     await shopsModel.findByIdAndUpdate(this.shop, { $inc: { allMoney: this.totalAmountAfterDiscount, productsMoney: -totalProductPrice } }, { new: true });
+    await subShopsModel.findByIdAndUpdate(this.subShop, { $inc: { allMoney: this.totalAmountAfterDiscount, productsMoney: -totalProductPrice } }, { new: true });
     next();
 });
 
