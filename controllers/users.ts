@@ -110,13 +110,17 @@ const addLoggedUserAddress = expressAsyncHandler(async (req: express.Request, re
     res.status(200).json({ message: 'your address added successfully', user: sanitizeUser(user) });
 });
 
-const deleteLoggedUserPhone = expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
-    const user = await usersModel.findByIdAndUpdate(req.user!._id, { $pull: { phone: req.body.phone } }, { new: true });
+const deleteLoggedUserPhone = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+    const user: UserModel | null = await usersModel.findById(req.user!._id);
+    if (user?.phone.length === 1 && user.role !== "manager") { return next(new ApiErrors('you must have at least one phone number', 400)); };
+    await usersModel.findByIdAndUpdate(req.user!._id, { $pull: { phone: req.body.phone } }, { new: true });
     res.status(200).json({ message: 'your phone number deleted successfully', user: sanitizeUser(user) });
 });
 
-const deleteLoggedUserAddress = expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
-    const user = await usersModel.findByIdAndUpdate(req.user!._id, { $pull: { address: req.body.address } }, { new: true });
+const deleteLoggedUserAddress = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+    const user: UserModel | null = await usersModel.findById(req.user!._id);
+    if (user?.address.length === 1 && user.role !== "manager") { return next(new ApiErrors('you must have at least one address', 400)); };
+    await usersModel.findByIdAndUpdate(req.user!._id, { $pull: { address: req.body.address } }, { new: true });
     res.status(200).json({ message: 'your address deleted successfully', user: sanitizeUser(user) });
 });
 

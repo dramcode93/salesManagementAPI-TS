@@ -33,7 +33,7 @@ const orderSchema: mongoose.Schema = new mongoose.Schema<OrderModel>({
     , { timestamps: true })
 
 orderSchema.pre<OrderModel>(/^find/, function (next: mongoose.CallbackWithoutResultAndOptionalError): void {
-    this.populate({ path: 'cartItems.product', select: 'name sellingPrice images shop' });
+    this.populate({ path: 'cartItems.product', select: 'name sellingPrice productPrice images shop subShops' });
     this.populate({ path: 'user', select: 'name phone email address' });
     this.populate({ path: 'shop', select: 'name image' });
     this.populate({ path: 'subShop', select: 'name' });

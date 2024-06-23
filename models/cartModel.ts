@@ -35,7 +35,7 @@ cartSchema.pre<CartModel>('save', async function (next: mongoose.CallbackWithout
 });
 
 cartSchema.pre<CartModel>(/^find/, function (next: mongoose.CallbackWithoutResultAndOptionalError): void {
-    this.populate({ path: 'cartItems.product', select: 'name sellingPrice images shop' });
+    this.populate({ path: 'cartItems.product', select: 'name sellingPrice images shop subShops' });
     next();
 });
 
