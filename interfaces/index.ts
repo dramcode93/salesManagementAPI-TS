@@ -55,6 +55,13 @@ interface UserModel extends mongoose.Document {
     createdAt: Date;
 };
 
+interface CompanyModel extends mongoose.Document {
+    name: string;
+    phone: string;
+    address: Address;
+    shop: mongoose.Schema.Types.ObjectId;
+};
+
 interface CustomerModel extends mongoose.Document {
     name: string;
     address: Address[];
@@ -234,4 +241,4 @@ declare module 'express' {
     }
 };
 
-export { CategoryModel, CouponModel, CartModel, ProductModel, UserModel, CustomerModel, BillModel, BillProducts, OrderModel, ShopModel, SubShopModel, ShopTypeModel, FinancialTransactionsModel, SalesModel, SubSalesModel, GovernorateModel, Address, CityModel, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery, EmailOptions, SendEmailOptions };
+export { CategoryModel, CouponModel, CartModel, ProductModel, UserModel, CustomerModel, CompanyModel, BillModel, BillProducts, OrderModel, ShopModel, SubShopModel, ShopTypeModel, FinancialTransactionsModel, SalesModel, SubSalesModel, GovernorateModel, Address, CityModel, FilterData, CustomError, QueryString, SearchQuery, PaginationQuery, EmailOptions, SendEmailOptions };
