@@ -179,7 +179,7 @@ interface CityModel extends mongoose.Document {
 // ? @desc Filter Data
 interface FilterData {
     category?: string;
-    shop?: string | mongoose.Schema.Types.ObjectId;
+    shop?: any;
     subShop?: any;
     user?: string | mongoose.Schema.Types.ObjectId;
     role?: any;

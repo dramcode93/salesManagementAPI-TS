@@ -1,7 +1,7 @@
 import express from "express";
 import expressAsyncHandler from "express-async-handler";
 import ApiErrors from "../utils/errors";
-import { SubShopModel } from "../interfaces";
+import { FilterData, SubShopModel } from "../interfaces";
 import { createOne, getAll, getAllList, getOne } from "./refactorHandler";
 import subShopsModel from "../models/subShopsModel";
 
@@ -23,6 +23,14 @@ const checkSubShops = expressAsyncHandler(async (req: express.Request, res: expr
     };
     next();
 });
+
+const filterSubShops = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
+    let filterData: FilterData = {};
+    if (req.user?.role === "customer") { filterData.shop = req.query.shop; }
+    else { filterData.shop = req.user?.shop; };
+    req.filterData = filterData;
+    next();
+};
 
 const addSubShopPhone = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
     const subShop: SubShopModel | null = await subShopsModel.findOne({ _id: req.params.id, shop: req.user?.shop });
@@ -59,4 +67,4 @@ const changeSubShopActivation = expressAsyncHandler(async (req: express.Request,
     res.status(200).json({ message: 'sub shop activation updated successfully' });
 });
 
-export { getSubShops, getSubShop, getSubShopsList, createSubShop, updateSubShop, checkSubShops, addSubShopPhone, deleteSubShopPhone, changeSubShopActivation, addSubShopPayment, deleteSubShopPayment };
+export { getSubShops, getSubShop, getSubShopsList, createSubShop, updateSubShop, checkSubShops, filterSubShops, addSubShopPhone, deleteSubShopPhone, changeSubShopActivation, addSubShopPayment, deleteSubShopPayment };
