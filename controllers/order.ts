@@ -12,7 +12,7 @@ import monthlySubSalesModel from '../models/monthlySubSalesModel';
 import yearlySalesModel from '../models/yearlySalesModel';
 import yearlySubSalesModel from '../models/yearlySubSalesModel';
 import ApiErrors from "../utils/errors";
-import { OrderModel, CartModel, BillProducts, ShopModel, SalesModel, SubSalesModel, SubShopModel } from '../interfaces';
+import { OrderModel, CartModel, BillProducts, ShopModel, SalesModel, SubSalesModel, SubShopModel, FilterData } from '../interfaces';
 import { getAll, getOne } from "./refactorHandler";
 
 export const createCashOrder = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
@@ -79,8 +79,11 @@ export const createCashOrder = expressAsyncHandler(async (req: express.Request, 
 });
 
 export const filterOrders = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
-    if (req.user?.role == 'customer') { req.filterData = { user: req.user?._id }; }
-    else { req.filterData = { shop: req.user?.shop }; };
+    let filterData: FilterData = {};
+    if (req.user?.role == 'customer') { filterData.user = req.user?._id; }
+    else if (req.user?.role == 'user') { filterData.shop = req.user?.shop; filterData.subShop = req.user.subShop }
+    else { filterData.shop = req.user?.shop; };
+    req.filterData = filterData;
     next();
 };
 export const getAllOrders = getAll<OrderModel>(ordersModel, 'orders')
