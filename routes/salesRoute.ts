@@ -6,7 +6,7 @@ import { checkSubShops } from "../controllers/subShops";
 
 const salesRoute: Router = Router();
 
-salesRoute.use(protectRoutes, checkActive, allowedTo('admin'), checkShops, checkSubShops);
+salesRoute.use(protectRoutes, checkActive, allowedTo('admin', 'user'), checkShops, checkSubShops);
 
 salesRoute.route('/daily').get(filterSales, getAllDaysSales)
 salesRoute.route('/monthly').get(filterSales, getAllMonthsSales)

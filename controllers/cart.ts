@@ -32,6 +32,10 @@ export const addToProductCart = expressAsyncHandler(async (req: express.Request,
                 else { return next(new ApiErrors('cannot add product from a different shop.', 400)); };
             } else { cart.cartItems.push({ product: productId }); };
         };
+        if (cart?.coupon && cart.totalPriceAfterDiscount) {
+            cart.coupon = undefined;
+            cart.totalPriceAfterDiscount = undefined;
+        }
         await cart.save();
     };
     res.status(200).json({ data: cart, message: 'Product added to cart successfully' });
@@ -45,6 +49,10 @@ export const getLoggedUserCart = expressAsyncHandler(async (req: express.Request
 
 export const removeSpecificCartItem = expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
     const cart: CartModel | null = await carts.findOneAndUpdate({ user: req.user?._id }, { $pull: { cartItems: { _id: req.params.id } } }, { new: true });
+    if (cart?.coupon && cart.totalPriceAfterDiscount) {
+        cart.coupon = undefined;
+        cart.totalPriceAfterDiscount = undefined;
+    }
     await cart?.save();
     res.status(200).json({ status: 'success', numOfCartItems: cart!.cartItems.length, data: cart });
 });
@@ -62,6 +70,10 @@ export const updateCartItemQuantity = expressAsyncHandler(async (req: express.Re
         const cartItem: BillProducts = cart.cartItems[itemIndex];
         cartItem.productQuantity = req.body.productQuantity;
         cart.cartItems[itemIndex] = cartItem;
+        if (cart?.coupon && cart.totalPriceAfterDiscount) {
+            cart.coupon = undefined;
+            cart.totalPriceAfterDiscount = undefined;
+        }
     }
     else { return next(new ApiErrors(`there is no item for this id : ${req.params.id}`, 404)); };
     await cart.save();
