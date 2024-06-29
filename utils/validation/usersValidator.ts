@@ -19,7 +19,12 @@ export const createUserValidator: express.RequestHandler[] = [
     check('name')
         .notEmpty().withMessage("product name is required")
         .isLength({ min: 2, max: 50 }).withMessage("name length must be between 2 and 50"),
-    check('email').optional().isEmail().withMessage('Invalid email'),
+    check('email').optional().isEmail().withMessage('Invalid email')
+        .custom(async (value: string): Promise<boolean> => {
+            const user: UserModel | null = await usersModel.findOne({ email: value });
+            if (user) { return Promise.reject(new Error('email already exists')); };
+            return true;
+        }),
     check('phone').optional().isMobilePhone('ar-EG').withMessage('Invalid phone number'),
     check('address').optional()
         .custom(async (address: Address): Promise<boolean> => {
