@@ -14,9 +14,9 @@ interface CouponModel extends mongoose.Document {
 interface CartModel extends mongoose.Document {
     cartItems: BillProducts[];
     totalCartPrice: number;
-    totalPriceAfterDiscount: number;
+    totalPriceAfterDiscount: number | undefined;
     user: mongoose.Schema.Types.ObjectId;
-    coupon: mongoose.Schema.Types.ObjectId;
+    coupon: mongoose.Schema.Types.ObjectId | undefined;
 };
 interface ProductModel extends mongoose.Document {
     name: string;
