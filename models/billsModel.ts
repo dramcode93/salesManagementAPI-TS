@@ -120,7 +120,7 @@ billSchema.pre<BillModel>('save', async function (next: mongoose.CallbackWithout
 });
 
 billSchema.pre<BillModel>(/^find/, function (next: mongoose.CallbackWithoutResultAndOptionalError): void {
-    this.populate({ path: 'products.product', select: 'name sellingPrice' });
+    this.populate({ path: 'products.product', select: 'name sellingPrice subShops' });
     this.populate({ path: 'user', select: '_id name' });
     this.populate({ path: 'customer', select: '_id name phone' });
     this.populate({ path: 'subShop', select: '_id name' });

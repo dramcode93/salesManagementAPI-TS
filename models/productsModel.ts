@@ -63,7 +63,7 @@ productSchema.post<ProductModel>('init', (document: ProductModel): void => { ima
 
 productSchema.pre<ProductModel>(/^find/, function (next: mongoose.CallbackWithoutResultAndOptionalError): void {
     this.populate({ path: 'category', select: 'name' });
-    this.populate({ path: 'shop', select: 'name address' });
+    this.populate({ path: 'shop', select: 'name' });
     next();
 });
 
