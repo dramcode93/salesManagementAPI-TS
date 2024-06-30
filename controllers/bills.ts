@@ -23,17 +23,26 @@ interface UpdateProduct { quantity: number; sold: number };
 
 const createBill = expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
     const products: BillProducts[] = req.body.products;
-    const bulkOptions = products.map((productData: BillProducts) => ({
-        updateOne: {
-            filter: { _id: productData.product },
-            update: { $inc: { quantity: -productData.productQuantity, sold: productData.productQuantity } }
-        }
-    }));
+    if (req.user?.role === "user") { req.body.subShop = req.user.subShop };
+
+    const bulkOptions = products.map((productData: BillProducts) => {
+        // * Find the subShopIndex
+        const subShopIndex: number = productData.product.subShops.findIndex((shop: any) => shop.subShop.toString() === req.body.subShop.toString());
+
+        // * Build the update object
+        const updateObject: any = { $inc: { quantity: -productData.productQuantity, sold: productData.productQuantity } };
+        if (subShopIndex > -1) { updateObject.$inc[`subShops.${subShopIndex}.quantity`] = -productData.productQuantity; };
+
+        return {
+            updateOne: {
+                filter: { _id: productData.product._id },
+                update: updateObject
+            }
+        };
+    });
     await productsModel.bulkWrite(bulkOptions);
-    // ! products.map(async (productData: BillProducts): Promise<void> => { await productsModel.findByIdAndUpdate(productData.product, { $inc: { quantity: -productData.productQuantity, sold: productData.productQuantity } }); });
     req.body.user = req.user?._id;
     req.body.shop = req.user?.shop;
-    if (req.user?.role === "user") { req.body.subShop = req.user.subShop };
     let bill: BillModel | null = await billsModel.create(req.body);
     const customer: CustomerModel | null = await customersModel.findById(bill.customer);
     bill = await billsModel.findByIdAndUpdate(bill._id, { customerName: customer?.name, code: bill._id.toString() }, { new: true })
