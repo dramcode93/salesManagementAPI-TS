@@ -10,6 +10,14 @@ import { createResetToken, createToken } from "../utils/createToken";
 import { UserModel } from "../interfaces";
 import { sanitizeUser } from "../utils/sanitization";
 
+const checkUsername = expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
+    const user: UserModel | null = await usersModel.findOne({ username: req.body.username });
+    let message;
+    if (user) { message = [{ en: "Username is not available" }, { ar: "اسم المستخدم غير متاح" }]; }
+    else { message = [{ en: "Username is available" }, { ar: "اسم المستخدم متاح" }]; };
+    res.status(200).json({ data: message });
+});
+
 const signup = expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
     req.body.role = 'customer';
     const user: UserModel = await usersModel.create(req.body);
@@ -113,4 +121,4 @@ const checkActive = expressAsyncHandler(async (req: express.Request, res: expres
     next();
 });
 
-export { signup, login, forgetPassword, verifyResetPasswordCode, resetPassword, protectRoutes, allowedTo, checkActive, refreshToken };
+export { checkUsername, signup, login, forgetPassword, verifyResetPasswordCode, resetPassword, protectRoutes, allowedTo, checkActive, refreshToken };
