@@ -16,7 +16,7 @@ export const signupValidator: express.RequestHandler[] = [
             return true;
         }),
     check('name')
-        .notEmpty().withMessage("product name is required")
+        .notEmpty().withMessage("name is required")
         .isLength({ min: 2, max: 50 }).withMessage("name length must be between 2 and 50"),
     check('email').notEmpty().withMessage('Email is required').isEmail().withMessage('Invalid email')
         .custom(async (value: string): Promise<boolean> => {
