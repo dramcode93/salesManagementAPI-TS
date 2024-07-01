@@ -13,8 +13,16 @@ import { sanitizeUser } from "../utils/sanitization";
 const checkUsername = expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
     const user: UserModel | null = await usersModel.findOne({ username: req.body.username });
     let message;
-    if (user) { message = [{ en: "Username is not available" }, { ar: "اسم المستخدم غير متاح" }]; }
+    if (user) { message = [{ en: "Username is not available" }, { ar: "اسم المستخدم موجود بالفعل" }]; }
     else { message = [{ en: "Username is available" }, { ar: "اسم المستخدم متاح" }]; };
+    res.status(200).json({ data: message });
+});
+
+const checkEmail = expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
+    const user: UserModel | null = await usersModel.findOne({ email: req.body.email });
+    let message;
+    if (user) { message = [{ en: "Email is not available" }, { ar: "البريد الإلكتروني موجود بالفعل" }]; }
+    else { message = [{ en: "Email is available" }, { ar: "البريد الإلكتروني متاح" }]; };
     res.status(200).json({ data: message });
 });
 
@@ -121,4 +129,4 @@ const checkActive = expressAsyncHandler(async (req: express.Request, res: expres
     next();
 });
 
-export { checkUsername, signup, login, forgetPassword, verifyResetPasswordCode, resetPassword, protectRoutes, allowedTo, checkActive, refreshToken };
+export { checkUsername, checkEmail, signup, login, forgetPassword, verifyResetPasswordCode, resetPassword, protectRoutes, allowedTo, checkActive, refreshToken };

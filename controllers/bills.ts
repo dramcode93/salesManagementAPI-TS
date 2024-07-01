@@ -33,8 +33,7 @@ const createBill = expressAsyncHandler(async (req: express.Request, res: express
             // * Find the subShopIndex
             const selectedProduct: ProductModel | null = await productsModel.findById(productData.product).session(session);
             if (!selectedProduct) { throw new Error(`Product with ID ${productData.product} not found`); }
-            const subShopIndex: number = selectedProduct.subShops.findIndex((shop: any) => shop.subShop.toString() === req.body.subShop);
-
+            const subShopIndex: number = selectedProduct.subShops.findIndex((shop: any) => shop.subShop._id.toString() === req.body.subShop);
             if (selectedProduct.subShops[subShopIndex].quantity < productData.productQuantity) { throw new Error(`not enough quantity to this product`); };
 
             // * Build the update object
