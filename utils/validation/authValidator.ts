@@ -32,14 +32,6 @@ export const signupValidator: express.RequestHandler[] = [
             const city: CityModel | null = await citiesModel.findById(address.city);
             if (!city) { return Promise.reject(new Error('city not found')); };
             if (city.governorate.toString() !== governorate._id.toString()) { return Promise.reject(new Error('city not belong to this governorate')); };
-            // ! array of address
-            // await Promise.all(address.map(async (item: Address): Promise<void> => {
-            //     const governorate: GovernorateModel | null = await governoratesModel.findById(item.governorate);
-            //     if (!governorate) { return Promise.reject(new Error('governorate not found')); };
-            //     const city: CityModel | null = await citiesModel.findById(item.city);
-            //     if (!city) { return Promise.reject(new Error('city not found')); };
-            //     if (city.governorate.toString() !== governorate._id.toString()) { return Promise.reject(new Error('city not belong to this governorate')); };
-            // }));
             return true;
         }),
     check('password')
@@ -56,10 +48,22 @@ export const signupValidator: express.RequestHandler[] = [
 ];
 
 export const loginValidator: express.RequestHandler[] = [
-    check('username').notEmpty().withMessage('name is Required'),
+    check('username').notEmpty().withMessage('username is Required')
+        .isLength({ min: 2, max: 20 }).withMessage('username must be between 2 and 20 characters'),
     check("password")
         .notEmpty().withMessage('password is required')
         .isLength({ min: 6, max: 14 }).withMessage('Password should be between 6 and 14'),
+    validatorMiddleware,
+];
+
+export const checkUsernameValidator: express.RequestHandler[] = [
+    check('username').notEmpty().withMessage('username is Required')
+        .isLength({ min: 2, max: 20 }).withMessage('username must be between 2 and 20 characters'),
+    validatorMiddleware,
+];
+
+export const checkEmailValidator: express.RequestHandler[] = [
+    check('email').notEmpty().withMessage('Email is required').isEmail().withMessage('Invalid email'),
     validatorMiddleware,
 ];
 

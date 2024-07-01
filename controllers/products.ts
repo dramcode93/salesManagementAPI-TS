@@ -1,5 +1,6 @@
 import express from 'express';
 import expressAsyncHandler from 'express-async-handler';
+import mongoose from 'mongoose';
 import sharp from 'sharp';
 import ApiErrors from '../utils/errors';
 import productsModel from "../models/productsModel";
@@ -17,61 +18,123 @@ const updateProduct = updateOne<ProductModel>(productsModel);
 const DeleteProduct = deleteOne<ProductModel>(productsModel);
 
 const createProduct = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
-    req.body.shop = req.user?.shop;
-    const { quantity, subShops } = req.body;
-    const totalSubShopQuantity = subShops.reduce((acc: number, subShop: { subShop: string, quantity: number }) => acc + subShop.quantity, 0);
-    if (quantity !== totalSubShopQuantity) { return next(new ApiErrors("Quantity does not match the sum of quantities in subShops", 400)); };
-    const product: ProductModel = await productsModel.create(req.body);
-    await shopsModel.findByIdAndUpdate(product.shop, { $inc: { productsMoney: product.quantity * product.productPrice } }, { new: true });
-    // ! const updatePromises = subShops.map((subShop: { subShop: string, quantity: number }) => { return subShopsModel.findByIdAndUpdate(subShop.subShop, { $inc: { productsMoney: subShop.quantity * req.body.productPrice } }, { new: true }); });
-    // ! await Promise.all(updatePromises);
-    const bulkOperations = subShops.map((subShop: { subShop: string, quantity: number }) => ({
-        updateOne: {
-            filter: { _id: subShop.subShop },
-            update: { $inc: { productsMoney: subShop.quantity * req.body.productPrice } }
-        }
-    }));
-    await subShopsModel.bulkWrite(bulkOperations);
-    res.status(200).json({ data: product });
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+        req.body.shop = req.user?.shop;
+        const { quantity, subShops } = req.body;
+        const totalSubShopQuantity = subShops.reduce((acc: number, subShop: { subShop: string, quantity: number }) => acc + subShop.quantity, 0);
+        if (quantity !== totalSubShopQuantity) {
+            await session.abortTransaction();
+            session.endSession();
+            return next(new ApiErrors("Quantity does not match the sum of quantities in subShops", 400));
+        };
+        const createdProduct = await productsModel.create([req.body], { session });
+        const product: ProductModel = createdProduct[0];
+        await shopsModel.findByIdAndUpdate(product.shop, { $inc: { productsMoney: product.quantity * product.productPrice } }, { new: true, session });
+        const bulkOperations = subShops.map((subShop: { subShop: string, quantity: number }) => ({
+            updateOne: {
+                filter: { _id: subShop.subShop },
+                update: { $inc: { productsMoney: subShop.quantity * req.body.productPrice } },
+                session: session
+            }
+        }));
+        await subShopsModel.bulkWrite(bulkOperations, { session });
+        await session.commitTransaction();
+        session.endSession();
+        res.status(200).json({ data: product });
+    } catch (error: any) {
+        await session.abortTransaction();
+        session.endSession();
+        res.status(500).json({ message: error.message, stack: error.stack });
+    }
 });
 
 const updateQuantity = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
-    const subShops: { subShop: string, quantity: number } = req.body.subShops;
-    if (!subShops || !subShops.subShop || !subShops.quantity || subShops.quantity < 0) { return next(new ApiErrors("Invalid request body", 400)); };
-    const product: ProductModel | null = await productsModel.findById(req.params.id);
-    if (!product) { return next(new ApiErrors("Product not found", 404)); };
-    let newQuantity: number = 0;
-    const subShopIndex: number = product.subShops.findIndex(shop => shop.subShop.toString() === subShops.subShop);
-    if (subShopIndex === -1) {
-        newQuantity = subShops.quantity;
-        await productsModel.findByIdAndUpdate(req.params.id, { $addToSet: { subShops: subShops }, $inc: { quantity: newQuantity } }, { new: true });
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+        const subShops: { subShop: string, quantity: number } = req.body.subShops;
+        if (!subShops || !subShops.subShop || !subShops.quantity || subShops.quantity < 0) {
+            await session.abortTransaction();
+            session.endSession();
+            return next(new ApiErrors("Invalid request body", 400));
+        };
+
+        const product: ProductModel | null = await productsModel.findById(req.params.id).session(session);
+        if (!product) {
+            await session.abortTransaction();
+            session.endSession();
+            return next(new ApiErrors("Product not found", 404));
+        };
+
+        let newQuantity: number = 0;
+        const subShopIndex: number = product.subShops.findIndex(shop => shop.subShop.toString() === subShops.subShop);
+        if (subShopIndex === -1) {
+            newQuantity = subShops.quantity;
+            await productsModel.findByIdAndUpdate(req.params.id, { $addToSet: { subShops: subShops }, $inc: { quantity: newQuantity } }, { new: true, session });
+        }
+        else {
+            newQuantity = subShops.quantity - product.subShops[subShopIndex].quantity;
+            await productsModel.findByIdAndUpdate(req.params.id, { $inc: { quantity: newQuantity, [`subShops.${subShopIndex}.quantity`]: newQuantity } }, { new: true, session });
+        };
+        await subShopsModel.findByIdAndUpdate(subShops.subShop, { $inc: { productsMoney: product.productPrice * newQuantity } }, { new: true, session });
+        await shopsModel.findByIdAndUpdate(product.shop, { $inc: { productsMoney: product.productPrice * newQuantity } }, { new: true, session });
+        await session.commitTransaction();
+        session.endSession();
+        res.status(200).json({ data: "product quantity updated successfully" });
+    } catch (error: any) {
+        await session.abortTransaction();
+        session.endSession();
+        res.status(500).json({ message: error.message, stack: error.stack });
     }
-    else {
-        newQuantity = subShops.quantity - product.subShops[subShopIndex].quantity;
-        await productsModel.findByIdAndUpdate(req.params.id, { $inc: { quantity: newQuantity, [`subShops.${subShopIndex}.quantity`]: newQuantity } }, { new: true });
-    };
-    await subShopsModel.findByIdAndUpdate(subShops.subShop, { $inc: { productsMoney: product.productPrice * newQuantity } }, { new: true });
-    await shopsModel.findByIdAndUpdate(product.shop, { $inc: { productsMoney: product.productPrice * newQuantity } }, { new: true });
-    res.status(200).json({ data: "product quantity updated successfully" });
 });
 
 const transportQuantity = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
-    const fromSubShop: SubShopModel | null = await subShopsModel.findById(req.body.from);
-    const toSubShop: SubShopModel | null = await subShopsModel.findById(req.body.to);
-    const product: ProductModel | null = await productsModel.findById(req.params.id);
-    if (!product || !fromSubShop || !toSubShop) { return next(new ApiErrors("Product or sub shop not found", 404)); };
-    const fromSubShopIndex: number = product.subShops.findIndex(shop => shop.subShop.toString() === req.body.from.toString());
-    if (fromSubShopIndex === -1) { return next(new ApiErrors("'from' SubShop not found in product", 404)); };
-    const toSubShopIndex: number = product.subShops.findIndex(shop => shop.subShop.toString() === req.body.to.toString());
-    if (product.subShops[fromSubShopIndex].quantity < req.body.quantity) { return next(new ApiErrors("not enough quantity in this sub shop", 400)) };
-    if (toSubShopIndex === -1) {
-        await productsModel.findByIdAndUpdate(req.params.id, { $inc: { [`subShops.${fromSubShopIndex}.quantity`]: -req.body.quantity } }, { new: true });
-        await productsModel.findByIdAndUpdate(req.params.id, { $addToSet: { subShops: { subShop: req.body.to, quantity: req.body.quantity } } }, { new: true });
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+        const fromSubShop: SubShopModel | null = await subShopsModel.findById(req.body.from).session(session);
+        const toSubShop: SubShopModel | null = await subShopsModel.findById(req.body.to).session(session);
+        const product: ProductModel | null = await productsModel.findById(req.params.id).session(session);
+
+        if (!product || !fromSubShop || !toSubShop) {
+            await session.abortTransaction();
+            session.endSession();
+            return next(new ApiErrors("Product or sub shop not found", 404));
+        };
+
+        const fromSubShopIndex: number = product.subShops.findIndex(shop => shop.subShop.toString() === req.body.from.toString());
+        if (fromSubShopIndex === -1) {
+            await session.abortTransaction();
+            session.endSession();
+            return next(new ApiErrors("'from' SubShop not found in product", 404));
+        };
+
+        const toSubShopIndex: number = product.subShops.findIndex(shop => shop.subShop.toString() === req.body.to.toString());
+        if (product.subShops[fromSubShopIndex].quantity < req.body.quantity) {
+            await session.abortTransaction();
+            session.endSession();
+            return next(new ApiErrors("not enough quantity in this sub shop", 400))
+        };
+
+        if (toSubShopIndex === -1) {
+            await productsModel.findByIdAndUpdate(req.params.id, { $inc: { [`subShops.${fromSubShopIndex}.quantity`]: -req.body.quantity } }, { new: true, session });
+            await productsModel.findByIdAndUpdate(req.params.id, { $addToSet: { subShops: { subShop: req.body.to, quantity: req.body.quantity } } }, { new: true, session });
+        }
+        else { await productsModel.findByIdAndUpdate(req.params.id, { $inc: { [`subShops.${fromSubShopIndex}.quantity`]: -req.body.quantity, [`subShops.${toSubShopIndex}.quantity`]: req.body.quantity } }, { new: true, session }); };
+
+        await subShopsModel.findByIdAndUpdate(req.body.from, { $inc: { productsMoney: - product.productPrice * req.body.quantity } }, { new: true, session });
+        await subShopsModel.findByIdAndUpdate(req.body.to, { $inc: { productsMoney: product.productPrice * req.body.quantity } }, { new: true, session });
+
+        await session.commitTransaction();
+        session.endSession();
+        res.status(200).json({ data: "quantity of product transported successfully" });
+    } catch (error: any) {
+        await session.abortTransaction();
+        session.endSession();
+        res.status(500).json({ message: error.message, stack: error.stack });
     }
-    else { await productsModel.findByIdAndUpdate(req.params.id, { $inc: { [`subShops.${fromSubShopIndex}.quantity`]: -req.body.quantity, [`subShops.${toSubShopIndex}.quantity`]: req.body.quantity } }, { new: true }); };
-    await subShopsModel.findByIdAndUpdate(req.body.from, { $inc: { productsMoney: - product.productPrice * req.body.quantity } }, { new: true });
-    await subShopsModel.findByIdAndUpdate(req.body.to, { $inc: { productsMoney: product.productPrice * req.body.quantity } }, { new: true });
-    res.status(200).json({ data: "quantity of product transported successfully" });
 });
 
 const addProductCategory = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
