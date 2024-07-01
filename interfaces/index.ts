@@ -229,6 +229,7 @@ interface SendEmailOptions {
     subject: string;
     text: string;
     html: string;
+    attachments: any;
 };
 
 // ? @desc express interfaces
