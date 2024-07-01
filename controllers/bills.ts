@@ -1,11 +1,12 @@
 import express from "express";
 import expressAsyncHandler from "express-async-handler";
+import mongoose from "mongoose";
 import ApiErrors from "../utils/errors";
 import billsModel from "../models/billsModel";
 import productsModel from "../models/productsModel";
 import customersModel from "../models/customersModel";
 import { deleteOne, getAll, getOne } from "./refactorHandler";
-import { BillModel, BillProducts, CustomerModel, FilterData } from "../interfaces";
+import { BillModel, BillProducts, CustomerModel, FilterData, ProductModel } from "../interfaces";
 
 const filterBills = (req: express.Request, res: express.Response, next: express.NextFunction): void => {
     let filterData: FilterData = {};
@@ -21,32 +22,48 @@ const deleteBill = deleteOne(billsModel);
 
 interface UpdateProduct { quantity: number; sold: number };
 
-const createBill = expressAsyncHandler(async (req: express.Request, res: express.Response): Promise<void> => {
-    const products: BillProducts[] = req.body.products;
-    if (req.user?.role === "user") { req.body.subShop = req.user.subShop };
+const createBill = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
+    const session = await mongoose.startSession();
+    session.startTransaction();
+    try {
+        const products: BillProducts[] = req.body.products;
+        if (req.user?.role === "user") { req.body.subShop = req.user.subShop };
 
-    const bulkOptions = products.map((productData: BillProducts) => {
-        // * Find the subShopIndex
-        const subShopIndex: number = productData.product.subShops.findIndex((shop: any) => shop.subShop.toString() === req.body.subShop.toString());
+        const bulkOptions = await Promise.all(products.map(async (productData: BillProducts) => {
+            // * Find the subShopIndex
+            const selectedProduct: ProductModel | null = await productsModel.findById(productData.product).session(session);
+            if (!selectedProduct) { throw new Error(`Product with ID ${productData.product} not found`); }
+            const subShopIndex: number = selectedProduct.subShops.findIndex((shop: any) => shop.subShop.toString() === req.body.subShop);
 
-        // * Build the update object
-        const updateObject: any = { $inc: { quantity: -productData.productQuantity, sold: productData.productQuantity } };
-        if (subShopIndex > -1) { updateObject.$inc[`subShops.${subShopIndex}.quantity`] = -productData.productQuantity; };
+            if (selectedProduct.subShops[subShopIndex].quantity < productData.productQuantity) { throw new Error(`not enough quantity to this product`); };
 
-        return {
-            updateOne: {
-                filter: { _id: productData.product._id },
-                update: updateObject
-            }
-        };
-    });
-    await productsModel.bulkWrite(bulkOptions);
-    req.body.user = req.user?._id;
-    req.body.shop = req.user?.shop;
-    let bill: BillModel | null = await billsModel.create(req.body);
-    const customer: CustomerModel | null = await customersModel.findById(bill.customer);
-    bill = await billsModel.findByIdAndUpdate(bill._id, { customerName: customer?.name, code: bill._id.toString() }, { new: true })
-    res.status(200).json({ data: bill });
+            // * Build the update object
+            const updateObject: any = { $inc: { quantity: -productData.productQuantity, sold: productData.productQuantity } };
+            if (subShopIndex > -1) { updateObject.$inc[`subShops.${subShopIndex}.quantity`] = -productData.productQuantity; }
+            else { throw new Error(`sub Shop with ID ${req.body.subShop} not found`); };
+            return {
+                updateOne: {
+                    filter: { _id: productData.product },
+                    update: updateObject,
+                    session: session
+                }
+            };
+        }));
+        await productsModel.bulkWrite(bulkOptions, { session });
+        req.body.user = req.user?._id;
+        req.body.shop = req.user?.shop;
+        const createdBills = await billsModel.create([req.body], { session });
+        let bill: BillModel | null = createdBills[0];
+        const customer: CustomerModel | null = await customersModel.findById(bill.customer).session(session);
+        bill = await billsModel.findByIdAndUpdate(bill._id, { customerName: customer?.name, code: bill._id.toString() }, { new: true, session })
+        await session.commitTransaction();
+        session.endSession();
+        res.status(200).json({ data: bill });
+    } catch (error: any) {
+        await session.abortTransaction();
+        session.endSession();
+        res.status(500).json({ message: error.message, stack: error.stack });
+    };
 });
 
 const updateBill = expressAsyncHandler(async (req: express.Request, res: express.Response, next: express.NextFunction): Promise<void> => {
